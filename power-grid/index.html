@@ -16,6 +16,8 @@
   header h1{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
   header h1 span{color:var(--accent)}
   header p.subline{font-size:14px;color:var(--text-dim)}
+  .back-link{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);text-decoration:none;margin-bottom:16px;transition:color .15s}
+  .back-link:hover{color:var(--accent)}
 
   /* Nav bar */
   .tech-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-bottom:24px;border-bottom:1px solid var(--border)}
@@ -125,6 +127,7 @@
 <body>
 <div class="container">
   <header>
+    <a href="/" class="back-link">← Back to portfolio</a>
     <h1>Example Team — <span>Power Grid v15</span></h1>
     <p class="subline">Example Team · Feb 2025 – Apr 2026 · 4,771 tickets · 218 valid surveys · team NPS +79 · Volume 100 @ 1.5× team avg · Efficiency 100 @ ratio ≤ 0.5</p>
     <nav class="tech-nav" id="tech-nav"></nav>

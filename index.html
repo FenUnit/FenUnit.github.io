@@ -1,96 +1,549 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ben Fennell — IT Support Specialist</title>
+  <meta name="description" content="Ben Fennell is an IT Support Specialist at Curtin University, building PowerShell tooling for Active Directory and Microsoft 365 administration." />
+  <meta name="theme-color" content="#0a192f" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ben Fennell" />
+  <meta property="og:description" content="IT Support Specialist building PowerShell/WPF tooling for AD and Microsoft 365." />
+  <meta property="og:url" content="https://benfennell.id.au/" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              900: '#0a192f',
+              800: '#112240',
+              700: '#1d2d50',
+            },
+            slate: {
+              200: '#ccd6f6', // primary
+              300: '#a8b2d1',
+              400: '#8892b0', // secondary
+              500: '#495670',
+            },
+            teal: {
+              accent: '#64ffda',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --mouse-x: 50%;
+      --mouse-y: 50%;
+    }
+    html { background: #0a192f; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    /* Cursor spotlight */
+    .spotlight {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: radial-gradient(
+        600px circle at var(--mouse-x) var(--mouse-y),
+        rgba(100, 255, 218, 0.06),
+        transparent 80%
+      );
+      transition: background 0.1s ease;
+    }
+    /* Selection */
+    ::selection { background: rgba(100, 255, 218, 0.25); color: #ccd6f6; }
+    /* Nav line indicator */
+    .nav-item .nav-line {
+      width: 2rem;
+      height: 1px;
+      background: #495670;
+      transition: width 0.2s ease, background 0.2s ease;
+      margin-right: 1rem;
+    }
+    .nav-item:hover .nav-line,
+    .nav-item.active .nav-line {
+      width: 4rem;
+      background: #ccd6f6;
+    }
+    .nav-item.active .nav-text { color: #ccd6f6; }
+    /* Scrollbar (webkit) */
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-track { background: #0a192f; }
+    ::-webkit-scrollbar-thumb { background: #233554; border-radius: 6px; border: 3px solid #0a192f; }
+    ::-webkit-scrollbar-thumb:hover { background: #495670; }
+    /* Group hover dimming utility - extends Tailwind */
+    .exp-list:hover > .exp-item:not(:hover) { opacity: 0.5; }
+    .exp-list:hover > .exp-item:not(:hover) h3 a { color: #ccd6f6; }
+    .exp-item { transition: opacity 0.2s ease; }
+    .exp-item:hover .exp-bg { opacity: 1; }
+    .exp-bg {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      background: rgba(45, 65, 100, 0.15);
+      box-shadow: 0 0 0 1px rgba(168, 178, 209, 0.05),
+                  inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+    }
+    .exp-item:hover h3 a,
+    .proj-item:hover h3 a { color: #64ffda; }
+    .exp-item h3 a,
+    .proj-item h3 a { transition: color 0.2s ease; }
+    /* Arrow nudge on hover */
+    .arrow { transition: transform 0.2s ease; display: inline-block; }
+    .link-arrow:hover .arrow { transform: translate(2px, -2px); }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
 
-  <header class="max-w-3xl mx-auto px-6 pt-16 pb-10">
-    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">Ben Fennell</h1>
-    <p class="mt-2 text-lg text-slate-600">IT Support Specialist · DTS Desktop Services, Curtin University</p>
-    <p class="mt-1 text-slate-500">Perth, Western Australia</p>
-    <div class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-      <a href="mailto:ben.fennell@example.com" class="text-blue-600 hover:underline">Email</a>
-      <a href="https://github.com/fenunit" class="text-blue-600 hover:underline">GitHub</a>
-      <a href="#" class="text-blue-600 hover:underline">LinkedIn</a>
+<body class="bg-navy-900 text-slate-400 leading-relaxed">
+
+  <a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal-accent focus:text-navy-900 focus:rounded">Skip to content</a>
+
+  <div class="spotlight" aria-hidden="true"></div>
+
+  <div class="mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24 lg:py-0">
+
+    <div class="lg:flex lg:justify-between lg:gap-4">
+
+      <!-- ============== LEFT: Sticky header ============== -->
+      <header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-24">
+        <div>
+          <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">
+            <a href="/" class="hover:text-teal-accent transition-colors">Ben Fennell</a>
+          </h1>
+          <h2 class="mt-3 text-lg font-medium tracking-tight text-slate-200 sm:text-xl">
+            IT Support Specialist
+          </h2>
+          <p class="mt-4 max-w-xs leading-normal text-slate-400">
+            I build PowerShell tooling that helps a university IT team work less reactively and more deliberately.
+          </p>
+
+          <!-- Nav -->
+          <nav aria-label="In-page jump links" class="nav hidden lg:block mt-16">
+            <ul class="w-max">
+              <li>
+                <a class="nav-item group flex items-center py-3" href="#about">
+                  <span class="nav-line"></span>
+                  <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-200 transition-colors">About</span>
+                </a>
+              </li>
+              <li>
+                <a class="nav-item group flex items-center py-3" href="#experience">
+                  <span class="nav-line"></span>
+                  <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-200 transition-colors">Experience</span>
+                </a>
+              </li>
+              <li>
+                <a class="nav-item group flex items-center py-3" href="#projects">
+                  <span class="nav-line"></span>
+                  <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-200 transition-colors">Projects</span>
+                </a>
+              </li>
+              <li>
+                <a class="nav-item group flex items-center py-3" href="#certifications">
+                  <span class="nav-line"></span>
+                  <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-200 transition-colors">Certifications</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <!-- Socials -->
+        <ul class="ml-1 mt-8 flex items-center gap-5 text-slate-500">
+          <li>
+            <a class="hover:text-slate-200 transition-colors" href="https://github.com/fenunit" target="_blank" rel="noreferrer noopener" aria-label="GitHub (opens in a new tab)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path fill-rule="evenodd" d="M12 2C6.475 2 2 6.475 2 12a9.994 9.994 0 006.838 9.488c.5.087.687-.213.687-.476 0-.237-.013-1.024-.013-1.862-2.512.463-3.162-.612-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.338 1.087 2.912.825.088-.65.35-1.087.638-1.337-2.225-.25-4.55-1.113-4.55-4.938 0-1.088.387-1.987 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.026a9.28 9.28 0 012.5-.338c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.024 2.75-1.024.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.687 0 3.838-2.337 4.688-4.562 4.938.362.312.675.912.675 1.85 0 1.337-.013 2.412-.013 2.75 0 .262.188.574.688.474A10.016 10.016 0 0022 12c0-5.525-4.475-10-10-10z" clip-rule="evenodd"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="hover:text-slate-200 transition-colors" href="#" target="_blank" rel="noreferrer noopener" aria-label="LinkedIn (opens in a new tab)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="hover:text-slate-200 transition-colors" href="mailto:ben.fennell@example.com" aria-label="Email">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            </a>
+          </li>
+        </ul>
+      </header>
+
+      <!-- ============== RIGHT: Main content ============== -->
+      <main id="content" class="pt-24 lg:w-1/2 lg:py-24">
+
+        <!-- About -->
+        <section id="about" aria-label="About me" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">About</h2>
+          </div>
+          <div class="space-y-4 text-slate-400">
+            <p>
+              I&rsquo;m an IT Support Specialist on Curtin University&rsquo;s
+              <span class="text-slate-200">DTS Desktop Services</span> team, where I&rsquo;ve spent close to a decade
+              progressing through Deployment, the Service Desk, and now Desktop Services. The work I&rsquo;m most
+              proud of is the tooling I&rsquo;ve built and shipped to the people around me &mdash; PowerShell WPF
+              applications that quietly take painful workflows and turn them into something supportable.
+            </p>
+            <p>
+              The clearest example is
+              <span class="text-slate-200">AdminForge</span>, a tool I designed, built, and deployed via Intune
+              Win32 that consolidates four high-volume Service Desk workflows into a single interface. It&rsquo;s
+              roughly halved median resolution time on the workflows it covers and meaningfully reduced
+              escalations to our team. Alongside it I built the
+              <span class="text-slate-200">Power Grid</span> &mdash; a radar-chart performance dashboard over
+              ServiceNow data that gives the team a fair, transparent view of how work is distributed.
+            </p>
+            <p>
+              Outside Curtin, I run a home lab that has become my proving ground for the infrastructure side of
+              things I don&rsquo;t touch at work yet &mdash; virtualisation, container orchestration, mesh networking,
+              DNS, and self-hosted services. I&rsquo;m also slowly working through embedded electronics with an
+              ESP32 kit, headed toward custom home-automation hardware.
+            </p>
+            <p class="text-slate-300">
+              When I&rsquo;m not at a keyboard, I&rsquo;m usually cooking, playing Frosthaven, or chasing my kid around.
+            </p>
+          </div>
+        </section>
+
+        <!-- Experience -->
+        <section id="experience" aria-label="Work experience" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">Experience</h2>
+          </div>
+
+          <ol class="exp-list group/list">
+
+            <!-- Role 1 -->
+            <li class="exp-item mb-12">
+              <div class="group relative grid pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <header class="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2 font-mono">
+                  Mar 2022 — Present
+                </header>
+                <div class="z-10 sm:col-span-6">
+                  <h3 class="font-medium leading-snug text-slate-200">
+                    <div>
+                      <a class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-accent" href="https://www.curtin.edu.au/" target="_blank" rel="noreferrer noopener">
+                        <span>IT Support Specialist · <span class="inline-block">Curtin University<span class="arrow whitespace-nowrap">&nbsp;↗</span></span></span>
+                      </a>
+                    </div>
+                    <div class="text-slate-300 text-sm mt-1">DTS Desktop Services</div>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    Design and ship PowerShell / WPF tooling deployed via Intune to internal teams. Recent work
+                    centres on AdminForge (production), the Power Grid performance dashboard, an enterprise-wide
+                    Exchange Online room mailbox timezone remediation across 593 rooms, and the planning and
+                    design of a Distribution List → Microsoft 365 Group migration tool.
+                  </p>
+                  <ul class="mt-2 flex flex-wrap gap-1.5" aria-label="Technologies used">
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">PowerShell</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">WPF / XAML</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Active Directory</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Exchange Online</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Intune</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Microsoft 365</span></li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+
+            <!-- Role 2 -->
+            <li class="exp-item mb-12">
+              <div class="group relative grid pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <header class="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2 font-mono">
+                  May 2020 — Mar 2022
+                </header>
+                <div class="z-10 sm:col-span-6">
+                  <h3 class="font-medium leading-snug text-slate-200">
+                    <div>
+                      <a class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-accent" href="https://www.curtin.edu.au/" target="_blank" rel="noreferrer noopener">
+                        <span>IT Support Officer · <span class="inline-block">Curtin University<span class="arrow whitespace-nowrap">&nbsp;↗</span></span></span>
+                      </a>
+                    </div>
+                    <div class="text-slate-300 text-sm mt-1">Service Desk</div>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    First point of contact for staff and student IT issues across the full Microsoft and
+                    Curtin-bespoke estate. Maintained broad knowledge of DTS support areas for accurate triage
+                    and escalation, authored Knowledge Articles used by the wider support function, and worked
+                    inside ITIL-aligned workflows in Cherwell and (later) ServiceNow.
+                  </p>
+                  <ul class="mt-2 flex flex-wrap gap-1.5" aria-label="Technologies used">
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">ITIL</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">ServiceNow</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Cherwell</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Microsoft 365</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Active Directory</span></li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+
+            <!-- Role 3 -->
+            <li class="exp-item mb-12">
+              <div class="group relative grid pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <header class="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2 font-mono">
+                  Oct 2016 — May 2020
+                </header>
+                <div class="z-10 sm:col-span-6">
+                  <h3 class="font-medium leading-snug text-slate-200">
+                    <div>
+                      <a class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-accent" href="https://www.curtin.edu.au/" target="_blank" rel="noreferrer noopener">
+                        <span>IT Deployment Officer · <span class="inline-block">Curtin University<span class="arrow whitespace-nowrap">&nbsp;↗</span></span></span>
+                      </a>
+                    </div>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    Deployed PCs and peripherals to clients across the Bentley campus &mdash; imaging, reimaging,
+                    and user-data migration. Liaised with clients and coordinated scheduling across multiple
+                    Deployment Officers&rsquo; workloads. Built the institutional knowledge of Curtin&rsquo;s endpoint
+                    estate that has underpinned every role since.
+                  </p>
+                  <ul class="mt-2 flex flex-wrap gap-1.5" aria-label="Technologies used">
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Windows</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Imaging</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Hardware</span></li>
+                    <li><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Data migration</span></li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+
+          </ol>
+
+          <div class="mt-12">
+            <a class="link-arrow inline-flex items-center font-semibold leading-tight text-slate-200 group" href="/resume.pdf" aria-label="View Full Resume">
+              <span>View Full Résumé</span>
+              <span class="arrow ml-1" aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" aria-label="Selected projects" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">Projects</h2>
+          </div>
+
+          <ul class="exp-list group/list">
+
+            <!-- AdminForge -->
+            <li class="exp-item proj-item mb-12">
+              <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <div class="z-10 sm:order-2 sm:col-span-6">
+                  <h3>
+                    <span class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200">
+                      <span>AdminForge<span class="arrow whitespace-nowrap">&nbsp;</span></span>
+                    </span>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    Production internal tool at Curtin DTS. A WPF PowerShell application I designed, built, and
+                    deployed via Intune Win32 with versioned detection rules and a first-time-setup wizard that
+                    bootstraps PowerShell 7, RSAT, and ExchangeOnlineManagement on a fresh device. Four production
+                    tabs consolidate previously fragmented Service Desk workflows; the codebase was refactored
+                    from a 1,600-line monolithic script into a modular structure with dot-sourced event handlers.
+                  </p>
+                  <ul class="relative z-10 mt-2 flex flex-wrap" aria-label="Technologies used">
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">PowerShell</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">WPF</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Intune Win32</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">EXO</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">AD</span></li>
+                  </ul>
+                </div>
+                <div class="z-10 sm:order-1 sm:col-span-2 sm:translate-y-1">
+                  <div class="aspect-video rounded border border-slate-500/20 bg-gradient-to-br from-navy-800 to-navy-700 flex items-center justify-center text-teal-accent/30 text-3xl font-mono">AF</div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Power Grid -->
+            <li class="exp-item proj-item mb-12">
+              <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <div class="z-10 sm:order-2 sm:col-span-6">
+                  <h3>
+                    <span class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200">
+                      <span>Power Grid<span class="arrow whitespace-nowrap">&nbsp;</span></span>
+                    </span>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    Radar-chart performance dashboard scoring seven Desktop Services technicians across six axes
+                    (Volume, Variety, Difficulty, Consistency, Efficiency, Feedback) using 4,771 ServiceNow tickets
+                    and 218 NPS survey responses. Multi-view HTML dashboard with hash-based routing, per-technician
+                    detail pages, rolling 13-month trend charts, and a full decisions document explaining every
+                    formula and exclusion.
+                  </p>
+                  <ul class="relative z-10 mt-2 flex flex-wrap" aria-label="Technologies used">
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">HTML</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Recharts</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">ServiceNow</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Python</span></li>
+                  </ul>
+                </div>
+                <div class="z-10 sm:order-1 sm:col-span-2 sm:translate-y-1">
+                  <div class="aspect-video rounded border border-slate-500/20 bg-gradient-to-br from-navy-800 to-navy-700 flex items-center justify-center text-teal-accent/30 text-3xl font-mono">PG</div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Home Lab -->
+            <li class="exp-item proj-item mb-12">
+              <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <div class="z-10 sm:order-2 sm:col-span-6">
+                  <h3>
+                    <span class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200">
+                      <span>Home Lab<span class="arrow whitespace-nowrap">&nbsp;</span></span>
+                    </span>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    Multi-service self-hosted stack on a single host. Home Assistant in a UTM VM, plus
+                    containerised Immich, Vaultwarden, AdGuard Home, and Homepage under OrbStack. Tailscale
+                    mesh networking provides three layers of off-LAN access — Serve for HTTPS-terminated tailnet
+                    hostnames, subnet routing, and direct tailnet IP — with HTTPS certificates and MagicDNS
+                    enabled. Uptime Kuma monitoring across the lot.
+                  </p>
+                  <ul class="relative z-10 mt-2 flex flex-wrap" aria-label="Technologies used">
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Home Assistant</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Tailscale</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Docker</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">AdGuard</span></li>
+                  </ul>
+                </div>
+                <div class="z-10 sm:order-1 sm:col-span-2 sm:translate-y-1">
+                  <div class="aspect-video rounded border border-slate-500/20 bg-gradient-to-br from-navy-800 to-navy-700 flex items-center justify-center text-teal-accent/30 text-3xl font-mono">HL</div>
+                </div>
+              </div>
+            </li>
+
+            <!-- ESP32 -->
+            <li class="exp-item proj-item mb-12">
+              <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+                <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
+                <div class="z-10 sm:order-2 sm:col-span-6">
+                  <h3>
+                    <span class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200">
+                      <span>ESP32 / Embedded<span class="arrow whitespace-nowrap">&nbsp;</span></span>
+                    </span>
+                  </h3>
+                  <p class="mt-2 text-sm leading-normal text-slate-400">
+                    Ongoing self-directed study of embedded electronics and Arduino C++ via a Freenove ESP32-S3
+                    starter kit. Working through GPIO, strapping pins, pull-up/pull-down topology, current
+                    limiting, switch debounce, and the Arduino preprocessor model. Bridge target: an ESPHome
+                    Bluetooth proxy for SwitchBot Meter sensors integrated into Home Assistant.
+                  </p>
+                  <ul class="relative z-10 mt-2 flex flex-wrap" aria-label="Technologies used">
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">ESP32-S3</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Arduino C++</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">ESPHome</span></li>
+                  </ul>
+                </div>
+                <div class="z-10 sm:order-1 sm:col-span-2 sm:translate-y-1">
+                  <div class="aspect-video rounded border border-slate-500/20 bg-gradient-to-br from-navy-800 to-navy-700 flex items-center justify-center text-teal-accent/30 text-3xl font-mono">µC</div>
+                </div>
+              </div>
+            </li>
+
+          </ul>
+        </section>
+
+        <!-- Certifications -->
+        <section id="certifications" aria-label="Certifications and training" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200">Certifications</h2>
+          </div>
+          <ul class="space-y-4 text-sm">
+            <li class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+              <span class="font-mono text-xs uppercase tracking-wide text-slate-500 sm:w-24 shrink-0">Sept 2023</span>
+              <span class="text-slate-200">Microsoft Certified: Modern Desktop Administrator Associate (MD-102)</span>
+            </li>
+            <li class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+              <span class="font-mono text-xs uppercase tracking-wide text-slate-500 sm:w-24 shrink-0">Sept 2025</span>
+              <span class="text-slate-200">CS50x — Harvard via edX</span>
+            </li>
+            <li class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+              <span class="font-mono text-xs uppercase tracking-wide text-slate-500 sm:w-24 shrink-0">In progress</span>
+              <span class="text-slate-200">Google Cybersecurity Certificate</span>
+            </li>
+            <li class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+              <span class="font-mono text-xs uppercase tracking-wide text-slate-500 sm:w-24 shrink-0">July 2021</span>
+              <span class="text-slate-200">Scrum Master — DDLS</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Footer -->
+        <footer class="max-w-md pb-16 text-sm text-slate-500 sm:pb-0">
+          <p>
+            Coded in <a href="https://code.visualstudio.com/" target="_blank" rel="noreferrer noopener" class="text-slate-400 hover:text-teal-accent transition-colors">Visual Studio Code</a>,
+            built with <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer noopener" class="text-slate-400 hover:text-teal-accent transition-colors">Tailwind CSS</a>,
+            and deployed with <a href="https://pages.github.com/" target="_blank" rel="noreferrer noopener" class="text-slate-400 hover:text-teal-accent transition-colors">GitHub Pages</a>. Set in Inter and JetBrains Mono.
+          </p>
+        </footer>
+
+      </main>
+
     </div>
-  </header>
+  </div>
 
-  <main class="max-w-3xl mx-auto px-6 pb-24">
+  <script>
+    // Cursor spotlight
+    document.addEventListener('mousemove', (e) => {
+      document.documentElement.style.setProperty('--mouse-x', e.clientX + 'px');
+      document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
+    });
 
-    <section class="mb-10">
-      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">About</h2>
-      <p class="text-slate-700 leading-relaxed">
-        Placeholder bio. IT Support Specialist with a decade of progressive experience across the Curtin University IT asset lifecycle. Designs and delivers PowerShell/WPF tooling deployed via Intune. Hands-on across Active Directory, Microsoft 365, Exchange Online, and self-hosted infrastructure.
-      </p>
-    </section>
+    // Scroll-spy nav
+    const navLinks = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('main section[id]');
 
-    <section class="mb-10">
-      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Projects</h2>
-      <div class="space-y-5">
-        <article>
-          <h3 class="font-semibold">AdminForge</h3>
-          <p class="text-slate-700 mt-1">Placeholder — WPF PowerShell tool consolidating four Service Desk workflows, deployed via Intune Win32.</p>
-        </article>
-        <article>
-          <h3 class="font-semibold">Power Grid</h3>
-          <p class="text-slate-700 mt-1">Placeholder — radar-chart performance dashboard over ServiceNow data.</p>
-        </article>
-        <article>
-          <h3 class="font-semibold">Home Lab</h3>
-          <p class="text-slate-700 mt-1">Placeholder — self-hosted services on macOS with Tailscale mesh networking.</p>
-        </article>
-      </div>
-    </section>
+    const setActive = (id) => {
+      navLinks.forEach(link => {
+        const isActive = link.getAttribute('href') === '#' + id;
+        link.classList.toggle('active', isActive);
+      });
+    };
 
-    <section class="mb-10">
-      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Experience</h2>
-      <div class="space-y-4">
-        <div class="flex justify-between gap-4">
-          <div>
-            <h3 class="font-semibold">IT Support Specialist</h3>
-            <p class="text-sm text-slate-600">DTS Desktop Services, Curtin University</p>
-          </div>
-          <span class="text-sm text-slate-500 whitespace-nowrap">Mar 2022 – Present</span>
-        </div>
-        <div class="flex justify-between gap-4">
-          <div>
-            <h3 class="font-semibold">IT Support Officer</h3>
-            <p class="text-sm text-slate-600">Service Desk, Curtin University</p>
-          </div>
-          <span class="text-sm text-slate-500 whitespace-nowrap">May 2020 – Mar 2022</span>
-        </div>
-        <div class="flex justify-between gap-4">
-          <div>
-            <h3 class="font-semibold">IT Deployment Officer</h3>
-            <p class="text-sm text-slate-600">Curtin University</p>
-          </div>
-          <span class="text-sm text-slate-500 whitespace-nowrap">Oct 2016 – May 2020</span>
-        </div>
-      </div>
-    </section>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    }, {
+      rootMargin: '-40% 0px -55% 0px',
+      threshold: 0,
+    });
 
-    <section class="mb-10">
-      <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Certifications</h2>
-      <ul class="text-slate-700 space-y-1">
-        <li>MD-102: Microsoft 365 Endpoint Administrator Associate</li>
-        <li>CS50x — Harvard via edX</li>
-        <li>Scrum Master — DDLS</li>
-      </ul>
-    </section>
+    sections.forEach(s => observer.observe(s));
 
-  </main>
-
-  <footer class="max-w-3xl mx-auto px-6 pb-12 text-sm text-slate-500">
-    Built with HTML and Tailwind · Hosted on GitHub Pages
-  </footer>
+    // Default to first section if nothing intersecting yet
+    if (sections[0]) setActive(sections[0].id);
+  </script>
 
 </body>
 </html>

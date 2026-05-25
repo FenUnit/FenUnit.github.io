@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Example Team — Power Grid v15</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root{--bg:#0c0e14;--surface:#151820;--surface2:#1c2030;--border:#2a2e3e;--text:#e0e4ef;--text-dim:#6b7394;--accent:#4ee1a0}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  .container{max-width:1320px;margin:0 auto;padding:40px 32px}
+
+  /* Header */
+  header{margin-bottom:24px}
+  header h1{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+  header h1 span{color:var(--accent)}
+  header p.subline{font-size:14px;color:var(--text-dim)}
+
+  /* Nav bar */
+  .tech-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+  .nav-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:8px 16px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;user-select:none}
+  .nav-btn:hover{border-color:#3a3e50;color:var(--text)}
+  .nav-btn.active{background:var(--surface2);border-color:color-mix(in srgb,var(--btn-color,var(--accent)) 50%,transparent);color:var(--text)}
+  .nav-btn.active .nav-dot{opacity:1}
+  .nav-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--btn-color,var(--accent));margin-right:8px;vertical-align:middle;opacity:.5;transition:opacity .15s}
+  .nav-btn[data-view="team"] .nav-dot{background:var(--accent)}
+
+  /* Views */
+  .view{padding-top:32px}
+  .view[hidden]{display:none}
+
+  /* Team view */
+  .grid-layout{display:grid;grid-template-columns:1fr 420px;gap:32px;align-items:start}
+  @media(max-width:1000px){.grid-layout{grid-template-columns:1fr}}
+  .radar-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px}
+  .radar-wrap{width:100%;aspect-ratio:1;max-width:600px;margin:0 auto}
+  svg text{font-family:'DM Sans',sans-serif}
+  .sidebar{display:flex;flex-direction:column;gap:12px}
+  .sidebar-header{display:flex;align-items:center;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);padding:0 4px 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
+  .sort-select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:11px;padding:4px 8px;border-radius:6px;cursor:pointer;text-transform:uppercase;letter-spacing:.6px}
+  .sort-select:hover{border-color:#3a3e50}
+  .sort-select:focus{outline:none;border-color:var(--accent)}
+  .tech-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s ease;position:relative;overflow:hidden;user-select:none}
+  .tech-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--card-color);opacity:0;transition:opacity .2s}
+  .tech-card.active::before{opacity:1}
+  .tech-card.active{border-color:color-mix(in srgb,var(--card-color) 40%,transparent);background:var(--surface2)}
+  .tech-card:not(.active){opacity:.5}
+  .tech-card:not(.active):hover{opacity:.7}
+  .tech-card:hover{border-color:#3a3e50}
+  .tech-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .tech-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .tech-dot{width:10px;height:10px;border-radius:50%;background:var(--card-color);flex-shrink:0}
+  .tech-meta{display:flex;align-items:center;gap:12px}
+  .tech-avg{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--card-color)}
+  .tech-toggle{width:34px;height:18px;border-radius:9px;background:#2a2e3e;position:relative;transition:background .2s;flex-shrink:0}
+  .tech-toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#555;top:2px;left:2px;transition:all .2s}
+  .tech-card.active .tech-toggle{background:var(--card-color)}
+  .tech-card.active .tech-toggle::after{background:#fff;left:18px}
+  .tech-info{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:8px;display:flex;gap:14px;flex-wrap:wrap}
+  .tech-bars{display:flex;flex-direction:column;gap:4px}
+  .bar-row{display:flex;align-items:center;gap:8px;font-size:11px}
+  .bar-label{width:72px;text-align:right;color:var(--text-dim);font-size:10px;flex-shrink:0}
+  .bar-label.sort-active{color:var(--accent);font-weight:600}
+  .bar-track{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+  .bar-value{width:32px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)}
+
+  /* Tooltip */
+  .tooltip{position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:100;min-width:240px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  .tooltip.show{opacity:1}
+  .tooltip h4{font-size:13px;font-weight:700;margin-bottom:8px}
+  .tooltip .row{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);padding:2px 0}
+  .tooltip .row.hl{color:var(--text);font-weight:600}
+  .tooltip .row span:last-child{font-family:'JetBrains Mono',monospace;color:var(--text)}
+  .tooltip .div{border-top:1px solid var(--border);margin:6px 0}
+  .tooltip .pill{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+  .pill-p{background:#1c4d3a;color:#4ee1a0}
+  .pill-ps{background:#3d3f24;color:#e1e14e}
+  .pill-d{background:#4d1c2a;color:#e14e7e}
+
+  /* Left column: stacks radar + explainer */
+  .team-left-col{display:flex;flex-direction:column;gap:24px;min-width:0}
+
+  /* Explainer panel */
+  .explainer-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .explainer-toggle{width:100%;background:none;border:none;color:var(--text);font-family:inherit;font-size:14px;font-weight:600;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s}
+  .explainer-toggle:hover{background:var(--surface2)}
+  .explainer-toggle .chev{color:var(--text-dim);font-size:12px;transition:transform .2s}
+  .explainer-toggle.open .chev{transform:rotate(180deg)}
+  .explainer-body{padding:0 24px 24px;display:flex;flex-direction:column;gap:12px}
+  .explainer-body[hidden]{display:none}
+  .metric-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+  .metric-card h3{font-size:13px;font-weight:700;margin-bottom:8px;color:var(--card-color,var(--accent))}
+  .metric-card .section{margin-bottom:6px;font-size:12px;line-height:1.5}
+  .metric-card .section:last-child{margin-bottom:0}
+  .metric-card .section strong{color:var(--text-dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:2px}
+
+  /* Tech view */
+  .tech-view-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px}
+  .tech-title-row{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .tech-title-dot{width:14px;height:14px;border-radius:50%;background:var(--tech-color)}
+  .tech-title-row h2{font-size:26px;font-weight:700;letter-spacing:-.3px}
+  .tech-tagline{font-size:14px;color:var(--tech-color);font-weight:500;margin-bottom:20px;letter-spacing:.3px}
+  .stats-strip{display:flex;gap:24px;padding:16px 20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap}
+  .stat{display:flex;flex-direction:column;gap:2px}
+  .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim)}
+  .stat-value{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:var(--text)}
+  .stat-value.accent{color:var(--tech-color)}
+  .tech-blurb{padding:24px 32px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:24px}
+  .tech-blurb p{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:14px}
+  .tech-blurb p:last-child{margin-bottom:0}
+
+  /* Monthly chart */
+  .chart-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px}
+  .chart-panel h3{font-size:16px;font-weight:600;margin-bottom:8px}
+  .chart-panel .chart-sub{font-size:12px;color:var(--text-dim);margin-bottom:20px}
+  .chart-wrap{width:100%;overflow-x:auto}
+  .chart-wrap svg{width:100%;height:auto;display:block;min-width:600px}
+  .chart-caveat{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:14px;text-align:center}
+  .chart-wrap .dot{cursor:pointer;transition:r .15s}
+  .chart-wrap .dot:hover{r:8}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Example Team — <span>Power Grid v15</span></h1>
+    <p class="subline">Example Team · Feb 2025 – Apr 2026 · 4,771 tickets · 218 valid surveys · team NPS +79 · Volume 100 @ 1.5× team avg · Efficiency 100 @ ratio ≤ 0.5</p>
+    <nav class="tech-nav" id="tech-nav"></nav>
+  </header>
+
+  <!-- Team view -->
+  <div id="view-team" class="view">
+    <div class="grid-layout">
+      <div class="team-left-col">
+        <div class="radar-panel"><div class="radar-wrap"><svg id="radar" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+        <div class="explainer-panel">
+          <button class="explainer-toggle" id="explainer-toggle">
+            <span>Metric Explainer — what each axis is actually measuring</span>
+            <span class="chev">▼</span>
+          </button>
+          <div class="explainer-body" id="explainer-body" hidden></div>
+        </div>
+      </div>
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <span>Ranked by <select class="sort-select" id="sort-by">
+            <option value="avg">Avg / Overall</option>
+            <option value="variety">Variety</option>
+            <option value="volume">Volume</option>
+            <option value="difficulty">Difficulty</option>
+            <option value="consistency">Consistency</option>
+            <option value="efficiency">Efficiency</option>
+            <option value="feedback">Feedback</option>
+          </select></span>
+        </div>
+        <div id="tech-cards"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech view -->
+  <div id="view-tech" class="view" hidden>
+    <div class="tech-view-panel">
+      <div class="tech-title-row">
+        <div class="tech-title-dot" id="tech-view-dot"></div>
+        <h2 id="tech-view-name"></h2>
+      </div>
+      <div class="tech-tagline" id="tech-view-tag"></div>
+      <div class="stats-strip" id="tech-view-stats"></div>
+    </div>
+    <div class="tech-blurb" id="tech-view-blurb"></div>
+    <div class="chart-panel">
+      <h3>Monthly Average Score</h3>
+      <p class="chart-sub">3-month rolling window · Feedback not included in monthly average (sample size too small)</p>
+      <div class="chart-wrap"><svg id="monthly-chart" viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <p class="chart-caveat">Note: Monthly values use a 3-month rolling window and are vulnerable to small sample size variation.</p>
+    </div>
+  </div>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+/* ═══ DATA ═══ */
+const DATA = {"Technician 1":{"variety":78.8,"volume":89.7,"difficulty":71.1,"consistency":61.8,"efficiency":79.8,"feedback":78.5,"meta":{"tickets":873,"work_units":3809,"avg_tier":3.56,"active":814,"excluded":59,"active_weeks":51,"total_weeks":54,"ratio":0.949,"work_types":{"Exchange / Email":267,"Hardware":235,"Software":169,"AD / Identity":102,"Network / Storage":60,"Other":32,"Device Management":6,"Security":2},"tiers":{"1":39,"2":142,"3":71,"4":537,"5":84},"surveys_n":31,"promoters":27,"passives":2,"detractors":2,"net_promoters":25,"raw_nps":80.6,"shrunk_nps":80.3,"avg_rating":9.23,"rate_component":90.2,"volume_component":61.0,"quality_weight":0.6},"monthly":{"2025-04":{"variety":63.6,"volume":100,"difficulty":64.0,"consistency":50.4,"efficiency":10,"avg":57.6,"tickets":35,"work_units":135},"2025-05":{"variety":67.2,"volume":97.3,"difficulty":72.4,"consistency":58.0,"efficiency":74.1,"avg":73.8,"tickets":108,"work_units":479},"2025-06":{"variety":72.2,"volume":88.3,"difficulty":70.9,"consistency":55.4,"efficiency":77.4,"avg":72.8,"tickets":164,"work_units":709},"2025-07":{"variety":73.4,"volume":78.7,"difficulty":71.8,"consistency":60.2,"efficiency":81.5,"avg":73.1,"tickets":191,"work_units":842},"2025-08":{"variety":78.5,"volume":69.0,"difficulty":71.6,"consistency":56.8,"efficiency":78.2,"avg":70.8,"tickets":176,"work_units":774},"2025-09":{"variety":79.3,"volume":82.4,"difficulty":74.8,"consistency":61.7,"efficiency":83.9,"avg":76.4,"tickets":210,"work_units":972},"2025-10":{"variety":78.2,"volume":88.3,"difficulty":77.4,"consistency":59.7,"efficiency":76.1,"avg":75.9,"tickets":208,"work_units":1001},"2025-11":{"variety":78.6,"volume":100,"difficulty":78.1,"consistency":69.3,"efficiency":81.3,"avg":81.5,"tickets":225,"work_units":1096},"2025-12":{"variety":77.4,"volume":87.8,"difficulty":78.6,"consistency":68.9,"efficiency":75.2,"avg":77.6,"tickets":157,"work_units":768},"2026-01":{"variety":79.7,"volume":85.2,"difficulty":77.4,"consistency":66.1,"efficiency":84.2,"avg":78.5,"tickets":147,"work_units":704},"2026-02":{"variety":82.5,"volume":95.7,"difficulty":71.1,"consistency":57.4,"efficiency":67.2,"avg":74.8,"tickets":183,"work_units":795},"2026-03":{"variety":77.6,"volume":98.9,"difficulty":68.1,"consistency":58.8,"efficiency":76.5,"avg":76.0,"tickets":266,"work_units":1108},"2026-04":{"variety":67.9,"volume":100,"difficulty":63.3,"consistency":66.2,"efficiency":82.2,"avg":75.9,"tickets":282,"work_units":1079}}},"Technician 2":{"variety":77.5,"volume":79.2,"difficulty":71.2,"consistency":68.1,"efficiency":96.7,"feedback":92.6,"meta":{"tickets":777,"work_units":3364,"avg_tier":3.56,"active":759,"excluded":18,"active_weeks":43,"total_weeks":54,"ratio":0.573,"work_types":{"Hardware":277,"Software":197,"Exchange / Email":140,"AD / Identity":71,"Other":49,"Network / Storage":34,"Device Management":7,"Security":2},"tiers":{"1":25,"2":111,"3":104,"4":477,"5":60},"surveys_n":44,"promoters":39,"passives":4,"detractors":1,"net_promoters":38,"raw_nps":86.4,"shrunk_nps":85.1,"avg_rating":9.41,"rate_component":92.5,"volume_component":92.7,"quality_weight":0.6},"monthly":{"2025-04":{"variety":10,"volume":16.3,"difficulty":75.0,"consistency":10,"efficiency":94.2,"avg":41.1,"tickets":4,"work_units":18},"2025-05":{"variety":67.7,"volume":64.4,"difficulty":70.4,"consistency":72.7,"efficiency":93.3,"avg":73.7,"tickets":75,"work_units":317},"2025-06":{"variety":70.6,"volume":64.0,"difficulty":72.4,"consistency":76.2,"efficiency":97.6,"avg":76.2,"tickets":118,"work_units":514},"2025-07":{"variety":71.5,"volume":77.9,"difficulty":72.3,"consistency":62.5,"efficiency":93.7,"avg":75.6,"tickets":191,"work_units":834},"2025-08":{"variety":72.0,"volume":82.5,"difficulty":75.6,"consistency":60.0,"efficiency":91.1,"avg":76.2,"tickets":200,"work_units":925},"2025-09":{"variety":71.3,"volume":81.9,"difficulty":75.9,"consistency":58.6,"efficiency":82.0,"avg":73.9,"tickets":207,"work_units":966},"2025-10":{"variety":73.2,"volume":73.0,"difficulty":78.4,"consistency":65.7,"efficiency":74.2,"avg":72.9,"tickets":170,"work_units":827},"2025-11":{"variety":74.4,"volume":59.0,"difficulty":77.3,"consistency":64.3,"efficiency":73.3,"avg":69.7,"tickets":135,"work_units":645},"2025-12":{"variety":69.6,"volume":72.2,"difficulty":77.1,"consistency":53.2,"efficiency":81.8,"avg":70.8,"tickets":133,"work_units":631},"2026-01":{"variety":68.3,"volume":87.4,"difficulty":77.2,"consistency":55.6,"efficiency":100,"avg":77.7,"tickets":152,"work_units":722},"2026-02":{"variety":72.8,"volume":100,"difficulty":76.3,"consistency":65.9,"efficiency":100,"avg":83.0,"tickets":191,"work_units":902},"2026-03":{"variety":78.1,"volume":95.6,"difficulty":66.1,"consistency":63.6,"efficiency":100,"avg":80.7,"tickets":268,"work_units":1071},"2026-04":{"variety":73.2,"volume":88.6,"difficulty":61.8,"consistency":65.1,"efficiency":100,"avg":77.7,"tickets":254,"work_units":933}}},"Technician 3":{"variety":64.1,"volume":87.3,"difficulty":78.2,"consistency":62.5,"efficiency":78.4,"feedback":92.9,"meta":{"tickets":764,"work_units":3707,"avg_tier":3.91,"active":717,"excluded":47,"active_weeks":49,"total_weeks":54,"ratio":0.979,"work_types":{"Hardware":432,"Software":153,"Network / Storage":60,"AD / Identity":59,"Exchange / Email":25,"Other":22,"Device Management":11,"Security":2},"tiers":{"1":1,"2":21,"3":80,"4":605,"5":57},"surveys_n":54,"promoters":42,"passives":11,"detractors":1,"net_promoters":41,"raw_nps":75.9,"shrunk_nps":76.5,"avg_rating":9.2,"rate_component":88.2,"volume_component":100.0,"quality_weight":0.6},"monthly":{"2025-04":{"variety":61.6,"volume":100,"difficulty":79.2,"consistency":41.2,"efficiency":86.7,"avg":73.7,"tickets":24,"work_units":118},"2025-05":{"variety":57.9,"volume":86.7,"difficulty":77.3,"consistency":40.2,"efficiency":86.3,"avg":69.7,"tickets":90,"work_units":427},"2025-06":{"variety":58.4,"volume":94.8,"difficulty":78.7,"consistency":47.5,"efficiency":87.0,"avg":73.3,"tickets":156,"work_units":761},"2025-07":{"variety":59.2,"volume":84.3,"difficulty":78.7,"consistency":55.2,"efficiency":96.3,"avg":74.7,"tickets":185,"work_units":902},"2025-08":{"variety":59.9,"volume":87.0,"difficulty":79.0,"consistency":58.1,"efficiency":96.3,"avg":76.1,"tickets":199,"work_units":976},"2025-09":{"variety":61.4,"volume":81.7,"difficulty":78.4,"consistency":62.0,"efficiency":84.6,"avg":73.6,"tickets":199,"work_units":964},"2025-10":{"variety":60.1,"volume":95.5,"difficulty":79.6,"consistency":66.3,"efficiency":73.1,"avg":74.9,"tickets":218,"work_units":1082},"2025-11":{"variety":63.1,"volume":99.8,"difficulty":79.8,"consistency":69.9,"efficiency":73.3,"avg":77.2,"tickets":219,"work_units":1091},"2025-12":{"variety":65.2,"volume":100,"difficulty":80.0,"consistency":71.8,"efficiency":75.2,"avg":78.4,"tickets":183,"work_units":916},"2026-01":{"variety":67.3,"volume":68.4,"difficulty":78.6,"consistency":54.1,"efficiency":90.4,"avg":71.8,"tickets":116,"work_units":565},"2026-02":{"variety":65.2,"volume":60.2,"difficulty":78.3,"consistency":48.6,"efficiency":81.2,"avg":66.7,"tickets":103,"work_units":500},"2026-03":{"variety":69.7,"volume":71.0,"difficulty":76.1,"consistency":54.0,"efficiency":76.5,"avg":69.5,"tickets":169,"work_units":795},"2026-04":{"variety":66.2,"volume":93.1,"difficulty":76.2,"consistency":57.7,"efficiency":73.5,"avg":73.3,"tickets":208,"work_units":980}}},"Technician 4":{"variety":82.5,"volume":82.7,"difficulty":76.2,"consistency":46.2,"efficiency":62.8,"feedback":75.2,"meta":{"tickets":739,"work_units":3513,"avg_tier":3.81,"active":689,"excluded":50,"active_weeks":40,"total_weeks":54,"ratio":1.327,"work_types":{"Hardware":224,"Exchange / Email":156,"Software":153,"Other":86,"AD / Identity":67,"Network / Storage":41,"Device Management":11,"Security":1},"tiers":{"1":19,"2":62,"3":94,"4":430,"5":134},"surveys_n":34,"promoters":27,"passives":4,"detractors":3,"net_promoters":24,"raw_nps":70.6,"shrunk_nps":72.6,"avg_rating":8.82,"rate_component":86.3,"volume_component":58.5,"quality_weight":0.6},"monthly":{"2025-04":{"variety":64.7,"volume":90.8,"difficulty":80.0,"consistency":10,"efficiency":63.1,"avg":61.7,"tickets":20,"work_units":100},"2025-05":{"variety":79.2,"volume":62.1,"difficulty":81.7,"consistency":10,"efficiency":71.8,"avg":61.0,"tickets":59,"work_units":306},"2025-06":{"variety":77.6,"volume":82.2,"difficulty":80.6,"consistency":20.7,"efficiency":74.0,"avg":67.0,"tickets":130,"work_units":660},"2025-07":{"variety":76.1,"volume":94.8,"difficulty":79.5,"consistency":41.8,"efficiency":77.9,"avg":74.0,"tickets":204,"work_units":1015},"2025-08":{"variety":76.3,"volume":100,"difficulty":79.1,"consistency":53.6,"efficiency":75.2,"avg":76.8,"tickets":248,"work_units":1226},"2025-09":{"variety":76.6,"volume":94.9,"difficulty":79.2,"consistency":48.0,"efficiency":74.1,"avg":74.6,"tickets":226,"work_units":1120},"2025-10":{"variety":75.7,"volume":70.5,"difficulty":80.3,"consistency":53.8,"efficiency":58.9,"avg":67.8,"tickets":158,"work_units":799},"2025-11":{"variety":76.5,"volume":56.6,"difficulty":79.7,"consistency":51.3,"efficiency":52.2,"avg":63.3,"tickets":124,"work_units":619},"2025-12":{"variety":78.0,"volume":48.5,"difficulty":79.1,"consistency":30.7,"efficiency":51.0,"avg":57.5,"tickets":86,"work_units":424},"2026-01":{"variety":80.3,"volume":91.3,"difficulty":79.1,"consistency":39.2,"efficiency":61.5,"avg":70.3,"tickets":153,"work_units":755},"2026-02":{"variety":81.7,"volume":74.5,"difficulty":78.3,"consistency":28.5,"efficiency":61.5,"avg":64.9,"tickets":127,"work_units":619},"2026-03":{"variety":81.0,"volume":84.4,"difficulty":71.6,"consistency":36.5,"efficiency":47.3,"avg":64.2,"tickets":214,"work_units":945},"2026-04":{"variety":71.5,"volume":78.0,"difficulty":66.9,"consistency":37.3,"efficiency":46.2,"avg":60.0,"tickets":199,"work_units":821}}},"Technician 5":{"variety":58.4,"volume":45.9,"difficulty":41.1,"consistency":70.8,"efficiency":67.1,"feedback":60.9,"meta":{"tickets":880,"work_units":1948,"avg_tier":2.06,"active":853,"excluded":27,"active_weeks":46,"total_weeks":54,"ratio":1.23,"work_types":{"Exchange / Email":463,"AD / Identity":257,"Hardware":91,"Network / Storage":32,"Other":26,"Software":10,"Device Management":1},"tiers":{"1":268,"2":432,"3":55,"4":112,"5":13},"surveys_n":13,"promoters":10,"passives":2,"detractors":1,"net_promoters":9,"raw_nps":69.2,"shrunk_nps":73.6,"avg_rating":9.0,"rate_component":86.8,"volume_component":22.0,"quality_weight":0.6},"monthly":{"2025-04":{"variety":60.3,"volume":39.9,"difficulty":45.9,"consistency":21.8,"efficiency":100,"avg":53.6,"tickets":17,"work_units":44},"2025-05":{"variety":57.8,"volume":65.2,"difficulty":39.5,"consistency":43.7,"efficiency":13.0,"avg":43.8,"tickets":152,"work_units":321},"2025-06":{"variety":57.1,"volume":61.9,"difficulty":40.0,"consistency":55.9,"efficiency":10,"avg":45.0,"tickets":232,"work_units":497},"2025-07":{"variety":55.1,"volume":60.2,"difficulty":39.4,"consistency":78.2,"efficiency":36.5,"avg":53.9,"tickets":306,"work_units":644},"2025-08":{"variety":53.4,"volume":47.3,"difficulty":39.4,"consistency":76.5,"efficiency":69.0,"avg":57.1,"tickets":252,"work_units":531},"2025-09":{"variety":52.7,"volume":42.3,"difficulty":38.8,"consistency":75.0,"efficiency":83.6,"avg":58.5,"tickets":241,"work_units":499},"2025-10":{"variety":59.5,"volume":44.2,"difficulty":41.7,"consistency":75.1,"efficiency":85.3,"avg":61.2,"tickets":221,"work_units":501},"2025-11":{"variety":65.1,"volume":48.9,"difficulty":44.4,"consistency":75.2,"efficiency":80.7,"avg":62.9,"tickets":218,"work_units":534},"2025-12":{"variety":66.6,"volume":52.5,"difficulty":46.4,"consistency":76.8,"efficiency":79.7,"avg":64.4,"tickets":178,"work_units":459},"2026-01":{"variety":66.3,"volume":41.3,"difficulty":44.7,"consistency":65.5,"efficiency":78.2,"avg":59.2,"tickets":140,"work_units":341},"2026-02":{"variety":57.2,"volume":42.5,"difficulty":41.8,"consistency":68.4,"efficiency":39.8,"avg":49.9,"tickets":158,"work_units":353},"2026-03":{"variety":53.3,"volume":43.0,"difficulty":40.8,"consistency":67.9,"efficiency":45.8,"avg":50.2,"tickets":222,"work_units":481},"2026-04":{"variety":47.4,"volume":35.9,"difficulty":39.6,"consistency":76.6,"efficiency":38.6,"avg":47.6,"tickets":182,"work_units":378}}},"Technician 6":{"variety":63.3,"volume":41.0,"difficulty":77.9,"consistency":63.4,"efficiency":71.7,"feedback":71.5,"meta":{"tickets":361,"work_units":1741,"avg_tier":3.89,"active":330,"excluded":31,"active_weeks":41,"total_weeks":54,"ratio":1.128,"work_types":{"Hardware":209,"Software":71,"Exchange / Email":22,"AD / Identity":20,"Network / Storage":20,"Other":15,"Security":2,"Device Management":2},"tiers":{"1":2,"2":8,"3":62,"4":243,"5":46},"surveys_n":20,"promoters":18,"passives":1,"detractors":1,"net_promoters":17,"raw_nps":85.0,"shrunk_nps":83.1,"avg_rating":9.25,"rate_component":91.6,"volume_component":41.5,"quality_weight":0.6},"monthly":{"2025-04":{"variety":60.2,"volume":76.3,"difficulty":82.5,"consistency":10,"efficiency":82.2,"avg":62.2,"tickets":16,"work_units":84},"2025-05":{"variety":60.0,"volume":49.8,"difficulty":82.1,"consistency":10,"efficiency":71.8,"avg":54.7,"tickets":47,"work_units":245},"2025-06":{"variety":58.4,"volume":38.8,"difficulty":82.0,"consistency":10,"efficiency":54.5,"avg":48.7,"tickets":60,"work_units":312},"2025-07":{"variety":60.6,"volume":28.7,"difficulty":80.0,"consistency":27.8,"efficiency":73.5,"avg":54.1,"tickets":61,"work_units":307},"2025-08":{"variety":65.6,"volume":28.3,"difficulty":80.0,"consistency":37.5,"efficiency":83.3,"avg":58.9,"tickets":63,"work_units":317},"2025-09":{"variety":66.0,"volume":35.0,"difficulty":80.0,"consistency":51.7,"efficiency":74.7,"avg":61.5,"tickets":82,"work_units":413},"2025-10":{"variety":65.6,"volume":41.0,"difficulty":81.6,"consistency":45.5,"efficiency":53.6,"avg":57.5,"tickets":90,"work_units":465},"2025-11":{"variety":64.8,"volume":47.4,"difficulty":80.6,"consistency":63.8,"efficiency":48.0,"avg":60.9,"tickets":102,"work_units":518},"2025-12":{"variety":67.1,"volume":46.3,"difficulty":80.5,"consistency":70.3,"efficiency":51.9,"avg":63.2,"tickets":80,"work_units":405},"2026-01":{"variety":69.4,"volume":52.3,"difficulty":79.5,"consistency":70.1,"efficiency":62.0,"avg":66.7,"tickets":87,"work_units":432},"2026-02":{"variety":63.4,"volume":47.6,"difficulty":78.0,"consistency":67.0,"efficiency":77.6,"avg":66.7,"tickets":82,"work_units":395},"2026-03":{"variety":55.5,"volume":46.1,"difficulty":73.5,"consistency":66.4,"efficiency":81.2,"avg":64.5,"tickets":117,"work_units":516},"2026-04":{"variety":44.8,"volume":41.9,"difficulty":71.2,"consistency":60.6,"efficiency":84.1,"avg":60.5,"tickets":105,"work_units":441}}},"Technician 7":{"variety":42.4,"volume":40.9,"difficulty":75.9,"consistency":55.2,"efficiency":87.6,"feedback":69.2,"meta":{"tickets":377,"work_units":1738,"avg_tier":3.79,"active":336,"excluded":41,"active_weeks":43,"total_weeks":54,"ratio":0.776,"work_types":{"Hardware":295,"Software":25,"Other":19,"AD / Identity":14,"Network / Storage":13,"Exchange / Email":8,"Device Management":3},"tiers":{"2":9,"3":83,"4":262,"5":23},"surveys_n":18,"promoters":15,"passives":3,"detractors":0,"net_promoters":15,"raw_nps":83.3,"shrunk_nps":81.9,"avg_rating":9.5,"rate_component":91.0,"volume_component":36.6,"quality_weight":0.6},"monthly":{"2025-04":{"variety":10,"volume":13.6,"difficulty":80.0,"consistency":10,"efficiency":21.0,"avg":26.9,"tickets":3,"work_units":15},"2025-05":{"variety":27.9,"volume":41.2,"difficulty":75.1,"consistency":51.2,"efficiency":75.6,"avg":54.2,"tickets":45,"work_units":203},"2025-06":{"variety":36.0,"volume":36.7,"difficulty":76.8,"consistency":43.8,"efficiency":88.0,"avg":56.3,"tickets":63,"work_units":295},"2025-07":{"variety":37.8,"volume":42.1,"difficulty":75.6,"consistency":55.5,"efficiency":87.9,"avg":59.8,"tickets":99,"work_units":451},"2025-08":{"variety":34.5,"volume":43.2,"difficulty":76.2,"consistency":53.9,"efficiency":95.7,"avg":60.7,"tickets":105,"work_units":485},"2025-09":{"variety":30.8,"volume":48.6,"difficulty":76.6,"consistency":67.0,"efficiency":88.2,"avg":62.2,"tickets":123,"work_units":573},"2025-10":{"variety":35.7,"volume":54.3,"difficulty":77.7,"consistency":60.3,"efficiency":85.3,"avg":62.7,"tickets":129,"work_units":615},"2025-11":{"variety":37.6,"volume":54.6,"difficulty":77.8,"consistency":47.1,"efficiency":72.9,"avg":58.0,"tickets":125,"work_units":597},"2025-12":{"variety":40.8,"volume":54.7,"difficulty":77.2,"consistency":43.2,"efficiency":72.9,"avg":57.8,"tickets":101,"work_units":478},"2026-01":{"variety":48.2,"volume":40.9,"difficulty":77.5,"consistency":30.0,"efficiency":81.7,"avg":55.7,"tickets":71,"work_units":338},"2026-02":{"variety":42.2,"volume":37.6,"difficulty":77.8,"consistency":64.4,"efficiency":99.6,"avg":64.3,"tickets":65,"work_units":312},"2026-03":{"variety":41.8,"volume":27.7,"difficulty":76.1,"consistency":55.0,"efficiency":91.5,"avg":58.4,"tickets":67,"work_units":310},"2026-04":{"variety":47.7,"volume":26.6,"difficulty":71.2,"consistency":57.1,"efficiency":98.5,"avg":60.2,"tickets":66,"work_units":280}}}};
+
+/* ═══ PERSONAS ═══ */
+const PERSONAS = {
+  "technician-2": {name:"Technician 2", tag:"The Complete Pro", paras:[
+    "Technician 2 scores above 90 on both Efficiency (96.7) and Feedback (92.6) while holding near-top Volume and broad Variety — nobody else on the team scores above 90 on two axes simultaneously. His 0.57 efficiency ratio means he closes tickets in roughly 57% of the tier median time, and his 39 promoters against 1 detractor in 44 surveys shows that speed isn't coming at quality's expense.",
+    "The one soft spot is T5 complex work: 60 tickets versus Technician 4's 134. Given how fast he handles T4 troubleshooting, there's headroom to take on more genuinely hard tickets — that would be the stretch goal. Otherwise he's the benchmark against which the team is measured."
+  ]},
+  "technician-1": {name:"Technician 1", tag:"The Engine", paras:[
+    "Technician 1 tops Volume (89.7) and Variety (78.8), and does it with the highest weekly coverage on the team at 51 of 54 active weeks. Her work type spread is remarkable — 267 Exchange/Email, 235 Hardware, 169 Software, 102 AD/Identity, 60 Network/Storage. She's the universal go-to when work of any kind needs picking up.",
+    "Her weaker spots are subtle. Efficiency sits at 79.8 (ratio 0.95 — just under tier median pace, not slow but not fast), and 2 detractors in 31 surveys is the second-highest detractor rate on the team. The growth edge is speed — a ratio below 0.8 would close the gap to Technician 2. Worth checking whether the sheer breadth of her queue is creating context-switch drag; the universal go-to often pays a throughput tax."
+  ]},
+  "technician-3": {name:"Technician 3", tag:"The Craftsman", paras:[
+    "The team's most-loved technician: 42 promoters, 1 detractor, net promoter count of 41 — team maximum. Highest Difficulty score on the team (78.2, avg tier 3.91), with 605 T4 tickets reflecting deep hardware troubleshooting.",
+    "Variety (64.1) is his lowest axis because 57% of his work is Hardware and another 20% is Software — he rarely touches Exchange, AD/Identity, or knowledge work. That's specialisation, not weakness: where Technician 2 is the Swiss-Army knife, Technician 3 is the scalpel. Broadening into Exchange/Email or AD/Identity would lift Variety past 75 and unlock more of the queue for him. What he does already, he does better than anyone."
+  ]},
+  "technician-4": {name:"Technician 4", tag:"The Generalist", paras:[
+    "Highest Variety on the team (82.5, all eight work types represented) and the highest T5 count at 134 complex tickets, nearly double the next person. Volume sits at 82.7 which is substantial work throughput alongside the complexity.",
+    "The softer numbers: Consistency (46.2) reflects 14 weeks with fewer than three tickets — weeks where other work crowded the queue. Efficiency (62.8, ratio 1.33) is the lowest on the team, which warrants honest inspection: how much of that is genuinely slower throughput versus the natural drag of taking the team's hardest tickets? The standout growth area is Feedback — 3 detractors in 34 surveys is roughly double the team rate, and two of them sit in work types where Variety is otherwise strong. Reading those three comments for a pattern is likely the highest-leverage action here."
+  ]},
+  "technician-6": {name:"Technician 6", tag:"The Heavy-Hitter", paras:[
+    "A smaller-scale mirror of Technician 3's profile. High Difficulty (77.9, avg tier 3.89 — 46 T5 tickets out of 361), hardware-focused (58% of work), and excellent per-survey feedback rate at 91.6 with 18 promoters and 1 detractor in 20 surveys.",
+    "Volume is where the score drops: 1,741 work units is about 40% below team average, driving Volume to 41.0. If that reflects part-time hours or a specialised role, it's an artefact. If full-time, throughput is the genuine question — he's demonstrably good at hard work, he may just need more of it routed his way."
+  ]},
+  "technician-7": {name:"Technician 7", tag:"The Hardware Sniper", paras:[
+    "Second-fastest on the team (Efficiency 87.6, ratio 0.78), zero detractors across 18 surveys, but the lowest Variety on the team at 42.4 — 78% of his tickets are Hardware. He's not hardware-focused, he's hardware-exclusive.",
+    "Whether that's a score to act on depends on role design. If he's the dedicated hardware resource by intention, the low Variety is just a deliberate specialisation and nothing needs doing. If the team future needs him cross-trained, his speed suggests he'd pick up new areas quickly. He's ready for harder tickets or different types; the choice is direction, not capability."
+  ]},
+  "technician-5": {name:"Technician 5", tag:"The Steady Hand", paras:[
+    "A distinctive profile: highest Consistency at 70.8 (46 of 54 active weeks with steady flow) and the highest raw ticket count at 880, but the lowest Difficulty at 41.1. This is because 700 of those 880 tickets are T1 or T2 work — essentially the tier-1 routine account and email lane. 463 Exchange/Email and 257 AD/Identity account for 82% of his work.",
+    "Per-survey feedback is solid (rate 86.8) and his small sample of 13 surveys will grow over time. The growth lane is upward: into T3/T4 work. His throughput and consistency suggest he'd handle more complex tickets fine if routed his way — it's a routing and development question, not a capability ceiling."
+  ]}
+};
+
+/* ═══ EXPLAINER CONTENT ═══ */
+const EXPLAINERS = [
+  {axis:"Variety", color:"#4ee1a0", what:"How broadly a tech's work spans the eight work-type categories (Hardware, Exchange/Email, AD/Identity, Software, Network/Storage, Security, Device Management, Other). Uses Shannon entropy — max score requires an even spread across all types.", why:"Breadth signals versatility and cross-training value. Specialists add depth, but the team needs generalists who can absorb any incoming ticket.", caution:"Low Variety can mean deliberate expertise, not poor performance. Always read alongside Difficulty: high Difficulty + low Variety = deep specialist; low Difficulty + low Variety = routine lane work."},
+  {axis:"Volume", color:"#e14e8b", what:"Tier-weighted work output. Each ticket is multiplied by a tier weight (T1=1, T2=2, T3=3, T4=5, T5=7) to reflect complexity. A score of 100 means producing 1.5× the team average work units.", why:"Measures productive output, not just raw ticket count. A tech closing 100 hard tickets scores higher than one closing 100 password resets.", caution:"Volume reflects ticket flow as much as individual effort. Specialists and part-timers will naturally sit lower — it's not a grade of work ethic."},
+  {axis:"Difficulty", color:"#4ea4e1", what:"Average tier of all tickets closed. T1 = auto/approval, T2 = quick routine, T3 = physical routine, T4 = troubleshooting, T5 = complex. Score = avg tier ÷ 5 × 100.", why:"Shows where in the complexity stack a tech spends their time. Useful for spotting under- or over-utilisation.", caution:"Tier assignment is partly automated (keywords, resolution time). Some T4s are really T3s that dragged out. Take averages as directional, not precise."},
+  {axis:"Consistency", color:"#e1a44e", what:"How steady a tech's output is week-to-week, measured as the coefficient of variation (std dev ÷ mean) of their share of weekly team work. Score = (1 − CV) × 100.", why:"Consistent contributors are easier to plan around and keep team flow steady through holidays and incidents.", caution:"Low Consistency isn't necessarily bad — may reflect project work, escalations, or duties that pull a tech away from the queue for stretches."},
+  {axis:"Efficiency", color:"#a44ee1", what:"How fast a tech closes tickets relative to the tier median (what a typical tech takes on a ticket of that difficulty). A ratio of 0.5 = score of 100. Excludes warranty waits, stale tickets, and waiting-on-user tickets.", why:"Fast resolution helps end users and clears backlog. The tier-median baseline makes this fair across specialisations.", caution:"Very fast resolution can mean poor triage or premature closure. Always read alongside Feedback — speed with high NPS is genuine efficiency; speed with detractors is a quality problem."},
+  {axis:"Feedback", color:"#e1e14e", what:"Customer satisfaction from the Customer Experience Survey, blending rate 60% (shrunk NPS) and volume 40% (net promoters vs team max). NPS classifies each survey as Promoter (9-10), Passive (7-8), or Detractor (0-6).", why:"The customer's voice, filtered through an industry-standard metric. Shrinkage handles small sample sizes fairly.", caution:"Survey response is biased — customers with extreme experiences respond more often. Not all tickets generate a survey. Five surveys were already excluded where the complaint was about someone else or process rather than the assigned tech."}
+];
+
+/* ═══ CONSTANTS ═══ */
+const COLORS = ['#4ee1a0','#e14e8b','#4ea4e1','#e1a44e','#a44ee1','#e1e14e','#4ee1e1'];
+const AXES = ['variety','volume','difficulty','consistency','efficiency','feedback'];
+const LABELS = ['Variety','Volume','Difficulty','Consistency','Efficiency','Feedback'];
+const N = AXES.length, CX=300, CY=300, R=220;
+
+function avgScore(d){return AXES.reduce((s,a)=>s+d[a],0)/N}
+function slug(name){return name.toLowerCase().replace(/\s+/g,'-')}
+
+const techs = Object.keys(DATA).sort((a,b)=>avgScore(DATA[b])-avgScore(DATA[a]));
+const colorMap = {}; techs.forEach((t,i)=>colorMap[t]=COLORS[i%COLORS.length]);
+const slugToTech = {}; techs.forEach(t => slugToTech[slug(t)] = t);
+
+/* ═══ STATE ═══ */
+let activeSet = new Set(techs);  // Team view: start with ALL toggled on
+let sortBy = 'avg';
+let currentView = 'team';
+
+/* ═══ NAV BAR ═══ */
+function buildNav(){
+  const nav = document.getElementById('tech-nav');
+  const teamBtn = `<button class="nav-btn" data-view="team"><span class="nav-dot"></span>Whole Team</button>`;
+  const techBtns = techs.map(t => {
+    const c = colorMap[t];
+    const first = t;  // anonymized: show full label instead of just first word
+    return `<button class="nav-btn" data-view="tech" data-tech="${slug(t)}" style="--btn-color:${c}"><span class="nav-dot"></span>${first}</button>`;
+  }).join('');
+  nav.innerHTML = teamBtn + techBtns;
+  nav.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.dataset.view;
+      window.location.hash = v === 'team' ? '' : '#/' + btn.dataset.tech;
+    });
+  });
+}
+
+function updateNavActive(){
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    const isTeam = btn.dataset.view === 'team';
+    const matchTech = !isTeam && btn.dataset.tech === currentView;
+    btn.classList.toggle('active', (currentView === 'team' && isTeam) || matchTech);
+  });
+}
+
+/* ═══ TEAM VIEW: RADAR ═══ */
+function polar(a,r){const x=a-Math.PI/2;return[CX+r*Math.cos(x),CY+r*Math.sin(x)]}
+
+function drawRadar(){
+  const svg = document.getElementById('radar');
+  let h='';
+  for(let ring=1;ring<=5;ring++){
+    const r=(ring/5)*R;
+    const p=[]; for(let i=0;i<N;i++) p.push(polar((2*Math.PI*i)/N,r));
+    const o=ring===5, m=ring===3;
+    h += `<polygon points="${p.map(pt=>pt.join(',')).join(' ')}" fill="none" stroke="${o?'#5560804d':m?'#2e3350':'#1e2235'}" stroke-width="${o?2.5:m?1:0.5}"${o?' stroke-dasharray="6 3"':''} />`;
+  }
+  for(let i=0;i<N;i++){
+    const [x,y] = polar((2*Math.PI*i)/N,R);
+    h += `<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="#252940" stroke-width="0.7" />`;
+  }
+  for(let i=0;i<N;i++){
+    const [x,y] = polar((2*Math.PI*i)/N,R+28);
+    h += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="#8890b0" font-size="12.5" font-weight="500">${LABELS[i]}</text>`;
+  }
+  for(let ring=1;ring<=5;ring++){
+    const r=(ring/5)*R;
+    h += `<text x="${CX+6}" y="${CY-r+4}" fill="${ring===5?'#556080':'#2e3350'}" font-size="9" font-family="JetBrains Mono,monospace">${ring*20}</text>`;
+  }
+  techs.filter(t=>activeSet.has(t)).forEach(tech=>{
+    const d=DATA[tech], c=colorMap[tech];
+    const pts=[];
+    for(let i=0;i<N;i++) pts.push(polar((2*Math.PI*i)/N,(d[AXES[i]]/100)*R));
+    h += `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${c}18" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" />`;
+    pts.forEach((p,i)=>{
+      h += `<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${c}" stroke="${c}40" stroke-width="3" data-tech="${tech}" data-axis="${AXES[i]}" class="vtx" style="cursor:pointer" />`;
+    });
+  });
+  if(!techs.some(t=>activeSet.has(t))) h += `<text x="${CX}" y="${CY}" text-anchor="middle" fill="#3a3e50" font-size="14">Toggle a technician to view</text>`;
+  svg.innerHTML = h;
+  svg.querySelectorAll('.vtx').forEach(el=>{
+    el.addEventListener('mouseenter', e=>showRadarTip(e, e.target.dataset.tech, e.target.dataset.axis));
+    el.addEventListener('mouseleave', hideTip);
+  });
+}
+
+/* ═══ TEAM VIEW: SIDEBAR ═══ */
+function sortedTechs(){
+  return techs.slice().sort((a,b) => {
+    const va = sortBy === 'avg' ? avgScore(DATA[a]) : DATA[a][sortBy];
+    const vb = sortBy === 'avg' ? avgScore(DATA[b]) : DATA[b][sortBy];
+    return vb - va;
+  });
+}
+
+function drawSidebar(){
+  const sb = document.getElementById('tech-cards');
+  sb.innerHTML = '';
+  sortedTechs().forEach(tech=>{
+    const d=DATA[tech], c=colorMap[tech], on=activeSet.has(tech);
+    const avg = avgScore(d).toFixed(1);
+    const shownVal = sortBy === 'avg' ? avg : DATA[tech][sortBy].toFixed(1);
+    const card = document.createElement('div');
+    card.className = `tech-card${on?' active':''}`;
+    card.style.setProperty('--card-color', c);
+    let bars='';
+    AXES.forEach((a,i)=>{
+      const v = d[a];
+      const isSort = (sortBy === a);
+      bars += `<div class="bar-row"><span class="bar-label${isSort?' sort-active':''}">${LABELS[i]}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${c}${on?'':'55'}"></div></div><span class="bar-value">${v.toFixed(0)}</span></div>`;
+    });
+    card.innerHTML = `<div class="tech-header">
+      <div class="tech-name"><span class="tech-dot" style="background:${c}"></span>${tech}</div>
+      <div class="tech-meta"><span class="tech-avg" style="color:${c}">${shownVal}</span><div class="tech-toggle"></div></div>
+    </div>
+    <div class="tech-info"><span>${d.meta.tickets} tickets</span><span>${d.meta.work_units} WU</span><span>tier ${d.meta.avg_tier}</span><span>${d.meta.surveys_n} surveys</span></div>
+    <div class="tech-bars">${bars}</div>`;
+    card.addEventListener('click', ()=>{
+      activeSet.has(tech)?activeSet.delete(tech):activeSet.add(tech);
+      drawRadar();drawSidebar();
+    });
+    sb.appendChild(card);
+  });
+}
+
+/* ═══ RADAR TOOLTIP ═══ */
+function showRadarTip(e, tech, axis){
+  const tip=document.getElementById('tooltip'), d=DATA[tech], c=colorMap[tech];
+  const labels={variety:'Variety',volume:'Volume',difficulty:'Difficulty',consistency:'Consistency',efficiency:'Efficiency',feedback:'Feedback'};
+  const tn={'1':'T1 Auto/Approval','2':'T2 Quick Routine','3':'T3 Physical Routine','4':'T4 Troubleshooting','5':'T5 Complex'};
+  let det='';
+  if(axis==='variety'){
+    Object.entries(d.meta.work_types).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{det+=`<div class="row"><span>${k}</span><span>${v}</span></div>`});
+  } else if(axis==='volume'){
+    det = `<div class="row"><span>Work units</span><span>${d.meta.work_units.toLocaleString()}</span></div><div class="row"><span>Raw tickets</span><span>${d.meta.tickets}</span></div>`;
+  } else if(axis==='difficulty'){
+    det = `<div class="row"><span>Avg tier</span><span>${d.meta.avg_tier} / 5.0</span></div><div class="div"></div>`;
+    Object.entries(d.meta.tiers).sort((a,b)=>a[0]-b[0]).forEach(([k,v])=>{det+=`<div class="row"><span>${tn[k]}</span><span>${v}</span></div>`});
+  } else if(axis==='consistency'){
+    det = `<div class="row"><span>Score</span><span>${d.consistency.toFixed(1)}</span></div><div class="row"><span>Active weeks</span><span>${d.meta.active_weeks} / ${d.meta.total_weeks}</span></div>`;
+  } else if(axis==='efficiency'){
+    det = `<div class="row"><span>Score</span><span>${d.efficiency.toFixed(1)}</span></div><div class="row"><span>Speed ratio</span><span>${d.meta.ratio.toFixed(2)}× median</span></div><div class="div"></div><div class="row"><span>Active tickets</span><span>${d.meta.active}</span></div><div class="row"><span>Excluded</span><span>${d.meta.excluded}</span></div>`;
+  } else if(axis==='feedback'){
+    const m=d.meta, qw=(m.quality_weight*100).toFixed(0), vw=(100-m.quality_weight*100).toFixed(0);
+    det = `<div class="row"><span>Score</span><span>${d.feedback.toFixed(1)}</span></div>`
+      + `<div class="row"><span>Surveys</span><span>${m.surveys_n}</span></div>`
+      + `<div class="row"><span>Avg rating</span><span>${m.avg_rating} / 10</span></div>`
+      + `<div class="div"></div>`
+      + `<div class="row"><span><span class="pill pill-p">Promoters</span></span><span>${m.promoters}</span></div>`
+      + `<div class="row"><span><span class="pill pill-ps">Passives</span></span><span>${m.passives}</span></div>`
+      + `<div class="row"><span><span class="pill pill-d">Detractors</span></span><span>${m.detractors}</span></div>`
+      + `<div class="div"></div>`
+      + `<div class="row"><span>Rate (${qw}%)</span><span>${m.rate_component}</span></div>`
+      + `<div class="row"><span>Volume (${vw}%)</span><span>${m.volume_component}</span></div>`;
+  }
+  tip.innerHTML = `<h4 style="color:${c}">${tech} — ${labels[axis]}</h4>${det}`;
+  tip.classList.add('show');
+  const r = e.target.getBoundingClientRect();
+  tip.style.left = Math.min(r.right+12, window.innerWidth-300) + 'px';
+  tip.style.top = Math.max(10, r.top-10) + 'px';
+}
+function hideTip(){document.getElementById('tooltip').classList.remove('show')}
+
+/* ═══ EXPLAINER ═══ */
+function drawExplainer(){
+  const body = document.getElementById('explainer-body');
+  body.innerHTML = EXPLAINERS.map(e => `
+    <div class="metric-card" style="--card-color:${e.color}">
+      <h3>${e.axis}</h3>
+      <div class="section"><strong>What it measures</strong>${e.what}</div>
+      <div class="section"><strong>Why it matters</strong>${e.why}</div>
+      <div class="section"><strong>Caveat</strong>${e.caution}</div>
+    </div>`).join('');
+}
+document.getElementById('explainer-toggle').addEventListener('click', () => {
+  const btn = document.getElementById('explainer-toggle');
+  const body = document.getElementById('explainer-body');
+  const open = btn.classList.toggle('open');
+  body.hidden = !open;
+});
+
+/* ═══ TECH VIEW ═══ */
+function showTechView(slugKey){
+  const tech = slugToTech[slugKey];
+  if(!tech){ showTeamView(); return; }
+  document.getElementById('view-team').hidden = true;
+  document.getElementById('view-tech').hidden = false;
+
+  const d = DATA[tech], c = colorMap[tech], m = d.meta;
+  const persona = PERSONAS[slugKey];
+  const topWorkType = Object.entries(m.work_types).sort((a,b)=>b[1]-a[1])[0][0];
+
+  document.getElementById('view-tech').style.setProperty('--tech-color', c);
+  document.getElementById('tech-view-dot').style.background = c;
+  document.getElementById('tech-view-name').textContent = persona.name;
+  document.getElementById('tech-view-tag').textContent = persona.tag;
+
+  const stats = document.getElementById('tech-view-stats');
+  stats.innerHTML = `
+    <div class="stat"><div class="stat-label">Avg score</div><div class="stat-value accent">${avgScore(d).toFixed(1)}</div></div>
+    <div class="stat"><div class="stat-label">Tickets</div><div class="stat-value">${m.tickets}</div></div>
+    <div class="stat"><div class="stat-label">Work units</div><div class="stat-value">${m.work_units.toLocaleString()}</div></div>
+    <div class="stat"><div class="stat-label">Avg tier</div><div class="stat-value">${m.avg_tier}</div></div>
+    <div class="stat"><div class="stat-label">Surveys</div><div class="stat-value">${m.surveys_n}</div></div>
+    <div class="stat"><div class="stat-label">Top work type</div><div class="stat-value">${topWorkType}</div></div>
+  `;
+  document.getElementById('tech-view-blurb').innerHTML = persona.paras.map(p=>`<p>${p}</p>`).join('');
+
+  drawMonthlyChart(tech);
+}
+
+function showTeamView(){
+  document.getElementById('view-team').hidden = false;
+  document.getElementById('view-tech').hidden = true;
+}
+
+/* ═══ MONTHLY CHART ═══ */
+function drawMonthlyChart(tech){
+  const d = DATA[tech], c = colorMap[tech];
+  const entries = Object.entries(d.monthly).filter(([k,v])=>v!==null);
+  const months = entries.map(([k])=>k);
+  const values = entries.map(([k,v])=>v);
+  const n = months.length;
+
+  const W=800, H=320;
+  const ML=45, MR=20, MT=20, MB=40;
+  const IW = W-ML-MR, IH = H-MT-MB;
+  const x = i => ML + (n>1 ? (i/(n-1))*IW : IW/2);
+  const y = v => MT + (1 - v/100) * IH;
+
+  let h = '';
+  // Gridlines
+  for(let t=0;t<=100;t+=20){
+    const yy = y(t);
+    h += `<line x1="${ML}" y1="${yy}" x2="${W-MR}" y2="${yy}" stroke="${t===0||t===100?'#2a2e3e':'#1e2235'}" stroke-width="${t===0||t===100?1:0.5}" ${t===50?'stroke-dasharray="4 3"':''}/>`;
+    h += `<text x="${ML-8}" y="${yy+4}" text-anchor="end" fill="#556080" font-size="10" font-family="JetBrains Mono,monospace">${t}</text>`;
+  }
+  // X labels
+  const monthLabel = s => {
+    const [y,m] = s.split('-');
+    const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return names[parseInt(m)-1] + ' ' + y.slice(2);
+  };
+  months.forEach((mo,i)=>{
+    h += `<text x="${x(i)}" y="${H-MB+16}" text-anchor="middle" fill="#8890b0" font-size="10">${monthLabel(mo)}</text>`;
+  });
+  // Area under curve (subtle)
+  let areaPath = `M ${x(0)} ${y(values[0].avg)}`;
+  for(let i=1;i<n;i++) areaPath += ` L ${x(i)} ${y(values[i].avg)}`;
+  areaPath += ` L ${x(n-1)} ${y(0)} L ${x(0)} ${y(0)} Z`;
+  h += `<path d="${areaPath}" fill="${c}15" stroke="none"/>`;
+  // Line
+  let linePath = `M ${x(0)} ${y(values[0].avg)}`;
+  for(let i=1;i<n;i++) linePath += ` L ${x(i)} ${y(values[i].avg)}`;
+  h += `<path d="${linePath}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  // Dots
+  values.forEach((v,i)=>{
+    h += `<circle class="dot" cx="${x(i)}" cy="${y(v.avg)}" r="5" fill="${c}" stroke="#0c0e14" stroke-width="2" data-idx="${i}"/>`;
+  });
+
+  const svg = document.getElementById('monthly-chart');
+  svg.innerHTML = h;
+
+  // Hover handlers
+  svg.querySelectorAll('.dot').forEach(dot=>{
+    dot.addEventListener('mouseenter', e=>{
+      const idx = +e.target.dataset.idx;
+      showMonthTip(e, tech, months[idx], values[idx]);
+    });
+    dot.addEventListener('mouseleave', hideTip);
+  });
+}
+
+function showMonthTip(e, tech, month, v){
+  const tip = document.getElementById('tooltip');
+  const c = colorMap[tech];
+  const monthLabel = s => {
+    const [yr,mo] = s.split('-');
+    const names=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return names[parseInt(mo)-1] + ' ' + yr;
+  };
+  const axis5 = ['variety','volume','difficulty','consistency','efficiency'];
+  const lab5 = ['Variety','Volume','Difficulty','Consistency','Efficiency'];
+  let det = `<div class="row hl"><span>Avg (5 axes)</span><span>${v.avg}</span></div><div class="div"></div>`;
+  axis5.forEach((a,i)=>{det += `<div class="row"><span>${lab5[i]}</span><span>${v[a]}</span></div>`});
+  det += `<div class="div"></div>`;
+  det += `<div class="row"><span>Tickets closed</span><span>${v.tickets}</span></div>`;
+  det += `<div class="row"><span>Work units</span><span>${v.work_units}</span></div>`;
+  tip.innerHTML = `<h4 style="color:${c}">${monthLabel(month)} <span style="color:var(--text-dim);font-weight:500;font-size:11px">· 3mo rolling</span></h4>${det}`;
+  tip.classList.add('show');
+  const r = e.target.getBoundingClientRect();
+  tip.style.left = Math.min(r.right+12, window.innerWidth-280) + 'px';
+  tip.style.top = Math.max(10, r.top-10) + 'px';
+}
+
+/* ═══ ROUTER ═══ */
+function route(){
+  const hash = window.location.hash.replace(/^#\/?/,'');
+  if(hash && slugToTech[hash]){
+    currentView = hash;
+    showTechView(hash);
+  } else {
+    currentView = 'team';
+    showTeamView();
+  }
+  updateNavActive();
+  window.scrollTo(0, 0);
+}
+
+/* ═══ INIT ═══ */
+buildNav();
+drawRadar();
+drawSidebar();
+drawExplainer();
+document.getElementById('sort-by').addEventListener('change', e=>{sortBy=e.target.value;drawSidebar()});
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>

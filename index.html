@@ -387,11 +387,11 @@
               <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
                 <div class="exp-bg absolute -inset-x-4 -inset-y-4 hidden rounded-md lg:-inset-x-6 lg:block z-0"></div>
                 <div class="z-10 sm:order-2 sm:col-span-6">
-                  <h3>
-                    <span class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200">
-                      <span>Power Grid<span class="arrow whitespace-nowrap">&nbsp;</span></span>
-                    </span>
-                  </h3>
+                    <h3>
+                    <a class="link-arrow inline-flex items-baseline font-medium leading-tight text-slate-200 hover:text-teal-accent transition-colors" href="/power-grid/">
+                        <span>Power Grid<span class="arrow whitespace-nowrap">&nbsp;↗</span></span>
+                    </a>
+                    </h3>
                   <p class="mt-2 text-sm leading-normal text-slate-400">
                     Radar-chart performance dashboard scoring seven Desktop Services technicians across six axes
                     (Volume, Variety, Difficulty, Consistency, Efficiency, Feedback) using 4,771 ServiceNow tickets
@@ -425,15 +425,15 @@
                   <p class="mt-2 text-sm leading-normal text-slate-400">
                     Multi-service self-hosted stack on a single host. Home Assistant in a UTM VM, plus
                     containerised Immich, Vaultwarden, AdGuard Home, and Homepage under OrbStack. Tailscale
-                    mesh networking provides three layers of off-LAN access — Serve for HTTPS-terminated tailnet
-                    hostnames, subnet routing, and direct tailnet IP — with HTTPS certificates and MagicDNS
+                    mesh networking provides three layers of off-LAN access - Serve for HTTPS-terminated tailnet
+                    hostnames, subnet routing, and direct tailnet IP - with HTTPS certificates and MagicDNS
                     enabled. Uptime Kuma monitoring across the lot.
                   </p>
                   <ul class="relative z-10 mt-2 flex flex-wrap" aria-label="Technologies used">
                     <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Home Assistant</span></li>
                     <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Tailscale</span></li>
                     <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Docker</span></li>
-                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">AdGuard</span></li>
+                    <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">Virtualisation</span></li>
                   </ul>
                 </div>
                 <div class="z-10 sm:order-1 sm:col-span-2 sm:translate-y-1">
@@ -455,8 +455,8 @@
                   <p class="mt-2 text-sm leading-normal text-slate-400">
                     Ongoing self-directed study of embedded electronics and Arduino C++ via a Freenove ESP32-S3
                     starter kit. Working through GPIO, strapping pins, pull-up/pull-down topology, current
-                    limiting, switch debounce, and the Arduino preprocessor model. Bridge target: an ESPHome
-                    Bluetooth proxy for SwitchBot Meter sensors integrated into Home Assistant.
+                    limiting, switch debounce, and the Arduino preprocessor model. Bridge target: building a
+                    rat-ratgdo board for local control of my Chamberlain garage door.
                   </p>
                   <ul class="relative z-10 mt-2 flex flex-wrap" aria-label="Technologies used">
                     <li class="mr-1.5 mt-2"><span class="font-mono inline-flex items-center rounded-full bg-teal-accent/10 px-3 py-1 text-xs font-medium leading-5 text-teal-accent">ESP32-S3</span></li>

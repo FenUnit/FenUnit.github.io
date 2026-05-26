@@ -181,7 +181,7 @@
     </div>
   </nav>
 
-  <main id="content" class="max-w-8xl mx-auto px-6 lg:px-12">
+  <main id="content" class="max-w-7xl mx-auto px-6 lg:px-12">
 
     <!-- Hero -->
     <section class="pt-20 pb-16 lg:pt-32 lg:pb-24">
@@ -341,58 +341,6 @@
           </div>
 
         </div>
-      </div>
-    </section>
-
-    <!-- Beyond the surface -->
-    <section class="border-t border-slate-500/10 pt-20 pb-24 mt-12 lg:mt-0">
-      <p class="section-num mb-3">Beyond the surface</p>
-      <h2 class="text-3xl font-bold text-slate-200 mb-8 max-w-3xl">A few engineering decisions that earned their keep.</h2>
-
-      <div class="grid md:grid-cols-2 gap-x-12 gap-y-10 max-w-5xl">
-
-        <div>
-          <h3 class="text-slate-200 font-semibold mb-3">The credential format problem</h3>
-          <p class="text-slate-400">
-            <span class="font-mono text-teal-accent text-sm">staff\pa.username@curtin.edu.au</span>. The NetBIOS-style prefix is required for the Win32 <span class="font-mono text-teal-accent text-sm">LogonUser</span> API used by Tab 4&rsquo;s ACL subprocess; the UPN suffix is required for Exchange Online. Strip either half and one of the two breaks &mdash; usually subtly, in production, at the worst time.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="text-slate-200 font-semibold mb-3">Start-Job with -PSVersion 5.1</h3>
-          <p class="text-slate-400">
-            Tab 4 reads ACLs from UNC paths via a child process under PA credentials. Forcing <span class="font-mono text-teal-accent text-sm">-PSVersion 5.1</span> makes the child <span class="font-mono text-teal-accent text-sm">powershell.exe</span> from System32 &mdash; not <span class="font-mono text-teal-accent text-sm">pwsh.exe</span> inherited from the MSIX-installed PowerShell 7, which lives in WindowsApps where PA accounts can&rsquo;t execute.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="text-slate-200 font-semibold mb-3">AUMID stamping</h3>
-          <p class="text-slate-400">
-            Without an AppUserModelID set on both the <span class="font-mono text-teal-accent text-sm">.lnk</span> shortcut (via <span class="font-mono text-teal-accent text-sm">IPropertyStore</span>) and the running process (via <span class="font-mono text-teal-accent text-sm">SetCurrentProcessExplicitAppUserModelID</span>), the Windows taskbar groups the running app under <span class="font-mono text-teal-accent text-sm">pwsh.exe</span> and shows the PowerShell icon, regardless of what the shortcut says.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="text-slate-200 font-semibold mb-3">UTF-8-no-BOM JSON I/O</h3>
-          <p class="text-slate-400">
-            PowerShell 5.1&rsquo;s <span class="font-mono text-teal-accent text-sm">ConvertTo-Json</span> occasionally emits a trailing comma. Writing back through <span class="font-mono text-teal-accent text-sm">System.IO.File.WriteAllText</span> with explicit <span class="font-mono text-teal-accent text-sm">UTF8Encoding($false)</span> avoids both the trailing-comma defect and BOM-related parse failures on round-trip.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="text-slate-200 font-semibold mb-3">Modular refactor</h3>
-          <p class="text-slate-400">
-            Mid-build, the monolithic 1,600-line PS1 was split into a bootstrapper, three Modules, and four EventHandlers, dot-sourced for shared scope. Cost a few painful days; took the cost of adding the next tab from weeks to days. The cleanest investment I&rsquo;ve ever made in PowerShell code.
-          </p>
-        </div>
-
-        <div>
-          <h3 class="text-slate-200 font-semibold mb-3">Versioned Intune deployment</h3>
-          <p class="text-slate-400">
-            Install scripts stamp a version number; Intune detection rules check it; updates flow automatically to existing installs when I bump both numbers in lockstep. No manual updates, no per-machine pushes, no questions in Teams about whether anyone&rsquo;s on the latest version.
-          </p>
-        </div>
-
       </div>
     </section>
 

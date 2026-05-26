@@ -190,11 +190,11 @@
         Admin<span class="text-teal-accent">Forge</span>
       </h1>
       <p class="text-xl text-slate-300 max-w-2xl leading-relaxed mb-6">
-        A Windows desktop tool consolidating four high-volume permission-management workflows for the IT Service Desk &mdash; built in PowerShell and WPF, packaged with a first-time-setup wizard, and deployed via Intune.
+        A Windows desktop tool consolidating four high-volume permission-management workflows for the IT Service Desk/Desktop Services. Built in PowerShell and WPF, packaged with a first-time-setup wizard, and deployed via Intune.
       </p>
       <div class="space-y-4 text-slate-400 max-w-2xl mb-8">
         <p>
-          Before AdminForge, &ldquo;Modify Folder Access&rdquo; and &ldquo;Add me to this mailbox&rdquo; tickets were the highest-friction work the Service Desk handled. The work required a mix of legacy GUIs, ad-hoc PowerShell, and an institutional knowledge of how Curtin&rsquo;s AD groups, Exchange Online mailboxes, and folder ACLs actually relate. New starters took weeks to become productive on these tickets. Experienced technicians made small mistakes that escalated to my team.
+          Before AdminForge, Modify Folder Access, Shared Mailbox and Calendar tickets were high volume, finnicky work the Service Desk handled. The work required a mix of ADUC, EXO, ad-hoc PowerShell, and an institutional knowledge of how Curtin’s AD groups, Exchange Online mailboxes, and folder ACLs actually relate. New starters took weeks to become productive on these tickets. Experienced technicians made small mistakes that escalated to my team.
         </p>
         <p>
           The shorthand: roughly <span class="text-slate-200 font-medium">half</span> the median resolution time for the workflows AdminForge covers, a meaningful drop in escalations, and onboarding for new Service Desk hires that takes <span class="text-slate-200 font-medium">hours rather than weeks</span>.
@@ -221,9 +221,9 @@
             <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.8fr)] gap-8 lg:gap-14 items-center h-full">
               <div class="slide-text">
                 <p class="section-num mb-3">01 · First-time setup</p>
-                <h2 class="text-3xl font-bold text-slate-200 mb-4">Bootstrap a fresh machine in under a minute.</h2>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">Bootstrap a fresh machine in one panel.</h2>
                 <div class="space-y-3 text-slate-400">
-                  <p><span class="text-slate-300 font-medium">Problem:</span> AdminForge depends on PowerShell 7, the RSAT ActiveDirectory module, ExchangeOnlineManagement, and ThreadJob. Walking each new user through these installs &mdash; including the RSAT step that requires admin elevation via <span class="font-mono text-teal-accent text-sm">Add-WindowsCapability</span> &mdash; meant a half-day onboarding session for every fresh device.</p>
+                  <p><span class="text-slate-300 font-medium">Problem:</span> AdminForge depends on PowerShell 7, the RSAT ActiveDirectory module, ExchangeOnlineManagement, and ThreadJob. Walking each new user through these installs &ndash; including the RSAT step that requires admin elevation via <span class="font-mono text-teal-accent text-sm">Add-WindowsCapability</span> - would mean a half-day onboarding session for every fresh device.</p>
                   <p><span class="text-slate-300 font-medium">Solution:</span> A setup wizard that ships alongside the app. Auto-elevates to admin at startup. Checks each prerequisite, surfaces an orange &ldquo;Install Now&rdquo; per row, flips to green &ldquo;Installed!&rdquo; once verified. On completion it writes a <span class="font-mono text-teal-accent text-sm">setup.state</span> file to <span class="font-mono text-teal-accent text-sm">ProgramData</span> and re-targets the Start Menu shortcut from <span class="font-mono text-teal-accent text-sm">powershell.exe</span> to <span class="font-mono text-teal-accent text-sm">pwsh.exe</span>.</p>
                 </div>
               </div>
@@ -242,8 +242,8 @@
                 <p class="section-num mb-3">02 · Privileged-account logon</p>
                 <h2 class="text-3xl font-bold text-slate-200 mb-4">One credential capture, never written to disk.</h2>
                 <div class="space-y-3 text-slate-400">
-                  <p><span class="text-slate-300 font-medium">Problem:</span> A privileged-account credential is used by every tab &mdash; AD queries, ACL operations against UNC paths, and Exchange Online. Re-prompting per tab is friction. Storing the credential is a security smell. Subtle credential-format bugs can fail silently three tabs deep.</p>
-                  <p><span class="text-slate-300 font-medium">Solution:</span> One logon form at startup. Captures the PA credential as a <span class="font-mono text-teal-accent text-sm">PSCredential</span>, formats it so it satisfies both the Win32 <span class="font-mono text-teal-accent text-sm">LogonUser</span> API (used by the Folder Access subprocess) and Exchange Online simultaneously. &ldquo;Test credentials before proceeding&rdquo; catches bad logons immediately. The credential is held in <span class="font-mono text-teal-accent text-sm">$global:AuthCred</span> for the session, never written to disk. EXO connects in the background while the user lands on Tab 1.</p>
+                  <p><span class="text-slate-300 font-medium">Problem:</span> A privileged-account credential is used by every tab &ndash; AD queries, ACL operations against UNC paths, and Exchange Online. Re-prompting per tab is annoying and storing the credential is insecure. Subtle credential-format bugs can fail silently three tabs deep.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> One logon form at startup. Captures the PA credential as a <span class="font-mono text-teal-accent text-sm">PSCredential</span>, formats it so it satisfies both the Win32 <span class="font-mono text-teal-accent text-sm">LogonUser</span> API (used by the Folder Access subprocess) and Exchange Online simultaneously. &ldquo;Test credentials before proceeding&rdquo; catches bad logons immediately. The credential is held in <span class="font-mono text-teal-accent text-sm">$global:AuthCred</span> for the session, never written to disk. EXO connects before the user lands on Tab 1.</p>
                 </div>
               </div>
               <div class="slide-image">
@@ -261,8 +261,8 @@
                 <p class="section-num mb-3">03 · Tab 1 · Meeting Rooms</p>
                 <h2 class="text-3xl font-bold text-slate-200 mb-4">Three room patterns, executed correctly every time.</h2>
                 <div class="space-y-3 text-slate-400">
-                  <p><span class="text-slate-300 font-medium">Problem:</span> Configuring a meeting room mailbox involves <span class="font-mono text-teal-accent text-sm">Set-CalendarProcessing</span>, <span class="font-mono text-teal-accent text-sm">Add-MailboxPermission</span>, calendar ACLs, and pruning default + anonymous access. Three patterns &mdash; Standard, Restricted, Manual Review &mdash; each need a different cmdlet combination. Mistakes lead to unbookable rooms or rooms anyone in the org can clobber.</p>
-                  <p><span class="text-slate-300 font-medium">Solution:</span> A single form fetches the current state, resolves the legacy DN entries in <span class="font-mono text-teal-accent text-sm">BookInPolicy</span> back to real display names. Classifies what pattern the room is in. Lets you switch with one apply. The <span class="text-slate-200">Clean Calendar Permissions</span> button normalises any room with stale or wrong perms &mdash; removes non-default principals, sets Default and Anonymous to <span class="font-mono text-teal-accent text-sm">AvailabilityOnly</span>, re-adds the PRIV-MBX group as Reviewer.</p>
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Configuring a meeting room mailbox involves <span class="font-mono text-teal-accent text-sm">Set-CalendarProcessing</span>, <span class="font-mono text-teal-accent text-sm">Add-MailboxPermission</span>, calendar ACLs, and pruning default + anonymous access. Three patterns &ndash; Standard, Restricted, Manual Review &ndash; each need a different cmdlet combination. Mistakes lead to unbookable rooms or rooms anyone in the org can invite.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> A single form fetches the current state, resolves the legacy DN entries in <span class="font-mono text-teal-accent text-sm">BookInPolicy</span> back to real display names. Classifies what pattern the room is in. Lets you switch with one apply. The <span class="text-slate-200">Clean Calendar Permissions</span> button normalises any room with stale or wrong perms &ndash; removes non-default principals, sets Default and Anonymous to <span class="font-mono text-teal-accent text-sm">AvailabilityOnly</span>, re-adds the PRIV-MBX group as Reviewer.</p>
                 </div>
               </div>
               <div class="slide-image">
@@ -280,8 +280,8 @@
                 <p class="section-num mb-3">04 · Tab 2 · Group Compare</p>
                 <h2 class="text-3xl font-bold text-slate-200 mb-4">Onboarding without the spreadsheet.</h2>
                 <div class="space-y-3 text-slate-400">
-                  <p><span class="text-slate-300 font-medium">Problem:</span> Most onboarding tickets are some variant of &ldquo;make this new starter like Joe Bloggs.&rdquo; Working out which groups Joe is in, which the new starter is in, and what&rsquo;s missing is tedious by hand &mdash; and dangerous if you assume rather than verify.</p>
-                  <p><span class="text-slate-300 font-medium">Solution:</span> Fetch both users&rsquo; group memberships, diff them side by side. Toggle to include group descriptions (slower because of the per-group LDAP lookup). Toggle to filter out common groups so only deltas remain. Multi-select on either side feeds into <span class="text-slate-200">Add U1 &rarr; U2</span> or the reverse &mdash; replicating membership in a single click. The status output records every add and remove for the ticket.</p>
+                  <p><span class="text-slate-300 font-medium">Problem:</span> HR onboarding tickets are some variant of &ldquo;match this new starter to Joe Bloggs.&rdquo; Working out which groups Joe is in, which the new starter is in, and what&rsquo;s missing is tedious by hand &ndash; and dangerous if you assume rather than verify.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> Fetch both users&rsquo; group memberships, diff them side by side. Toggle to include group descriptions (slower because of the per-group LDAP lookup). Toggle to filter out common groups so only deltas remain. Multi-select on either side feeds into <span class="text-slate-200">Add U1 &rarr; U2</span> or the reverse &ndash; replicating membership in a single click. The status output records every add and remove for the ticket.</p>
                 </div>
               </div>
               <div class="slide-image">
@@ -299,8 +299,8 @@
                 <p class="section-num mb-3">05 · Tab 3 · PRIV Group Manager</p>
                 <h2 class="text-3xl font-bold text-slate-200 mb-4">From an email to the right group, every time.</h2>
                 <div class="space-y-3 text-slate-400">
-                  <p><span class="text-slate-300 font-medium">Problem:</span> Shared and room mailbox access is controlled by <span class="font-mono text-teal-accent text-sm">priv-mbx-*</span> AD groups. Going from a user&rsquo;s request to the right AD group means resolving the email in EXO, deriving the PRIV group name, and finding that group in AD. DisplayName collisions in production mean naïve lookups occasionally surface the wrong group.</p>
-                  <p><span class="text-slate-300 font-medium">Solution:</span> An <span class="text-slate-200">8-strategy EXO&harr;AD resolution chain</span> handles every collision pattern we&rsquo;ve seen, including two <span class="font-mono text-teal-accent text-sm">PRIV-MBX-*</span> groups sharing a DisplayName (resolved via DistinguishedName). Lookup &rarr; resolved group &rarr; current members &rarr; add or remove with auto-generated ticket notes that include the standard 30-minute Azure AD Connect sync warning. Managed By is editable inline.</p>
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Shared and room mailbox access is controlled by <span class="font-mono text-teal-accent text-sm">priv-mbx-*</span> AD groups. Going from a user&rsquo;s request to the right AD group means resolving the email in EXO, deriving the PRIV group name, and finding that group in AD. DisplayName collisions in production mean naïve lookups occasionally surface the wrong group, or no group at all.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> An <span class="text-slate-200">EXO&harr;AD resolution chain</span> handles every collision pattern we&rsquo;ve seen, including two <span class="font-mono text-teal-accent text-sm">PRIV-MBX-*</span> groups sharing a DisplayName (resolved via DistinguishedName). Lookup &rarr; resolved group &rarr; current members &rarr; add or remove with auto-generated ticket notes that include the standard 30-minute Azure AD Connect sync warning. Managed By is editable inline.</p>
                 </div>
               </div>
               <div class="slide-image">
@@ -318,7 +318,7 @@
                 <p class="section-num mb-3">06 · Tab 4 · Folder Access</p>
                 <h2 class="text-3xl font-bold text-slate-200 mb-4">From a path to a group, with the right ACL classification.</h2>
                 <div class="space-y-3 text-slate-400">
-                  <p><span class="text-slate-300 font-medium">Problem:</span> Modify Folder Access used to be the most error-prone work in the team. A staff member asks for access to a shared folder. The technician must identify which AD group controls that folder&rsquo;s ACL (often multiple groups overlap), pick the right one, and add the user. Reading the ACL under a PA account runs into the WindowsApps execution restriction on modern PowerShell installs.</p>
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Modify Folder Access used to be the most error-prone work in the team. A staff member asks for access to a shared folder. The technician must identify which AD group controls that folder&rsquo;s ACL (often multiple groups overlap), pick the right one, and add the user. Working across 3 different programs was frustrating and led to mistakes.</p>
                   <p><span class="text-slate-300 font-medium">Solution:</span> Faculty quick-fill buttons map common drive prefixes. Path lookup runs the ACL fetch in a subprocess via <span class="font-mono text-teal-accent text-sm">Start-Job -PSVersion 5.1</span>, forcing Windows PowerShell 5.1 from <span class="font-mono text-teal-accent text-sm">System32</span> instead of <span class="font-mono text-teal-accent text-sm">pwsh.exe</span> from the unreadable WindowsApps directory. Returned groups are classified into <span class="text-slate-200">Likely</span> and <span class="text-slate-200">Unlikely</span>. Pick a group, paste IDs, apply. Ticket notes write themselves.</p>
                 </div>
               </div>
@@ -349,10 +349,10 @@
       <p class="section-num mb-3">Roadmap</p>
       <h2 class="text-3xl font-bold text-slate-200 mb-6 max-w-3xl">Four more tabs in the queue.</h2>
       <ul class="space-y-3 text-slate-400 max-w-3xl">
-        <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">Shared Mailbox</span><span>Cloud-native refactor of the standalone provisioning tool. Single create-mailbox + create-PRIV-group + set-permissions, no DirSync polling state machine.</span></li>
-        <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">DL Creator</span><span>Cloud-managed distribution list wizard. Always adds the manager to members. State-machine re-entrancy for resumable runs.</span></li>
+        <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">Shared Mailbox</span><span>Cloud-native refactor of the standalone SMB Creator provisioning tool. Single create-mailbox + create-PRIV-group + set-permissions.</span></li>
+        <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">DL Creator</span><span>Cloud-managed distribution list wizard.  Re-entrancy for resumable runs.</span></li>
         <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">ADUC Plus</span><span>Cross-domain (staff + student) Active Directory browser with cached lookups, drilldown, edits, and native computer-object support.</span></li>
-        <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">Administration</span><span>Global admin: cache fetch, credential refresh, dark mode, tab visibility toggles, undo log for destructive actions.</span></li>
+        <li class="flex gap-4"><span class="font-mono text-teal-accent text-sm shrink-0 w-32">Administration</span><span>Global admin: cache fetch, credential refresh, dark mode, tab visibility toggles.</span></li>
       </ul>
     </section>
 

@@ -36,20 +36,17 @@
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     ::selection { background: rgba(100, 255, 218, 0.25); color: #ccd6f6; }
 
-    /* Cursor spotlight */
     .spotlight {
       pointer-events: none; position: fixed; inset: 0; z-index: 30;
       background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(100, 255, 218, 0.05), transparent 80%);
       transition: background 0.1s ease;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 12px; }
     ::-webkit-scrollbar-track { background: #0a192f; }
     ::-webkit-scrollbar-thumb { background: #233554; border-radius: 6px; border: 3px solid #0a192f; }
     ::-webkit-scrollbar-thumb:hover { background: #495670; }
 
-    /* Tech tags */
     .tag {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
@@ -63,73 +60,6 @@
       line-height: 1.4;
     }
 
-    /* ===== Book / Page flip ===== */
-    .book {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      perspective: 1800px;
-      perspective-origin: 30% center;
-    }
-    .page {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      transform-origin: left center;
-      transition: transform 0.85s cubic-bezier(.55, .05, .25, 1), box-shadow 0.85s ease;
-      backface-visibility: hidden;
-      border-radius: 6px;
-      overflow: hidden;
-      background: #1c2030;
-      box-shadow:
-        0 10px 30px -10px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(168, 178, 209, 0.06),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
-    }
-    .page img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      background: #f4f4f4;
-      display: block;
-    }
-    /* Subtle "page edge" gradient on the spine side */
-    .page::before {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0; left: 0;
-      width: 30px;
-      background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent);
-      pointer-events: none;
-      z-index: 2;
-    }
-    .page.flipped {
-      transform: rotateY(-178deg);
-      box-shadow:
-        0 30px 60px -15px rgba(0, 0, 0, 0.8),
-        0 0 0 1px rgba(168, 178, 209, 0.06);
-    }
-
-    /* Page index badge */
-    .page-badge {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 1.5px;
-      color: #495670;
-      background: rgba(10, 25, 47, 0.85);
-      padding: 6px 10px;
-      border-radius: 4px;
-      border: 1px solid rgba(168, 178, 209, 0.1);
-      z-index: 3;
-      backdrop-filter: blur(8px);
-    }
-
-    /* Section markers */
     .section-num {
       font-family: 'JetBrains Mono', monospace;
       color: #64ffda;
@@ -138,49 +68,96 @@
       letter-spacing: 2px;
     }
 
-    /* Scroll snap helpers */
-    .scrolly-section {
-      min-height: 92vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 4rem 0;
-    }
-    @media (max-width: 1023px) {
-      .scrolly-section {
-        min-height: auto;
-        padding: 2rem 0;
-      }
-    }
-
-    /* Progress indicator */
-    .progress-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #495670;
-      transition: all 0.3s ease;
-    }
-    .progress-dot.active {
-      background: #64ffda;
-      box-shadow: 0 0 12px rgba(100, 255, 218, 0.6);
-      transform: scale(1.4);
-    }
-
-    /* Arrow nudge */
     .arrow { transition: transform 0.2s ease; display: inline-block; }
     .link-arrow:hover .arrow { transform: translate(2px, -2px); }
 
-    /* Mobile image stack */
-    @media (max-width: 1023px) {
-      .mobile-shot {
-        background: #1c2030;
-        border-radius: 6px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(168, 178, 209, 0.06);
-        margin-bottom: 2rem;
+    /* ===== Slide stack ===== */
+    .slide-image-frame {
+      border-radius: 6px;
+      overflow: hidden;
+      background: #f4f4f4;
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(168, 178, 209, 0.08);
+    }
+    .slide-image-frame img { display: block; width: 100%; height: auto; }
+
+    /* Mobile: slides flow vertically as normal articles */
+    .slide { margin-bottom: 5rem; }
+
+    @media (min-width: 1024px) {
+      .scrolly-stack-section { height: 580vh; }
+      .slide-pin {
+        position: sticky;
+        top: 6rem;
+        height: calc(100vh - 6rem);
       }
-      .mobile-shot img { width: 100%; height: auto; display: block; background: #f4f4f4; }
+      .slide-stack {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        margin-bottom: 0;
+        pointer-events: none;
+      }
+      .slide.active { pointer-events: auto; }
+
+      .slide-text, .slide-image {
+        will-change: transform, opacity;
+        transition:
+          transform 700ms cubic-bezier(.22, 1, .36, 1),
+          opacity 500ms ease;
+      }
+      .slide-image { transition-delay: 80ms; }
+
+      .slide.next .slide-text  { transform: translateX(-80px); opacity: 0; }
+      .slide.next .slide-image { transform: translateX(80px); opacity: 0; }
+      .slide.active .slide-text,
+      .slide.active .slide-image { transform: translateX(0); opacity: 1; }
+      .slide.past .slide-text  { transform: translateX(80px); opacity: 0; }
+      .slide.past .slide-image { transform: translateX(-80px); opacity: 0; }
+
+      .slide-progress {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        display: flex;
+        gap: 6px;
+        padding: 0 4px;
+      }
+      .slide-progress-bar {
+        flex: 1;
+        height: 2px;
+        background: rgba(73, 86, 112, 0.3);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+      }
+      .slide-progress-bar::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: #64ffda;
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 500ms cubic-bezier(.22, 1, .36, 1);
+      }
+      .slide-progress-bar.filled::after,
+      .slide-progress-bar.current::after { transform: scaleX(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slide-text, .slide-image {
+        transition: opacity 200ms ease !important;
+        transform: none !important;
+      }
+      .slide.next .slide-text, .slide.next .slide-image,
+      .slide.past .slide-text, .slide.past .slide-image {
+        transform: none !important;
+      }
     }
   </style>
 </head>
@@ -191,7 +168,6 @@
 
   <div class="spotlight" aria-hidden="true"></div>
 
-  <!-- Top nav -->
   <nav class="sticky top-0 z-40 bg-navy-900/80 backdrop-blur border-b border-slate-500/10">
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <a href="/" class="font-mono text-xs uppercase tracking-widest text-slate-400 hover:text-teal-accent transition-colors link-arrow">
@@ -203,7 +179,7 @@
 
   <main id="content" class="max-w-6xl mx-auto px-6 lg:px-12">
 
-    <!-- ============== Hero ============== -->
+    <!-- Hero -->
     <section class="pt-20 pb-16 lg:pt-32 lg:pb-24">
       <p class="section-num mb-6">Curtin University · DTS Desktop Services</p>
       <h1 class="text-5xl lg:text-7xl font-bold tracking-tight text-slate-200 mb-6">
@@ -230,126 +206,142 @@
       </div>
     </section>
 
-    <!-- ============== Scrollytelling ============== -->
-    <section class="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-start mt-8 lg:mt-16 mb-20">
+    <!-- Scrollytelling slide stack -->
+    <section class="scrolly-stack-section relative" aria-label="AdminForge feature tour">
 
-      <!-- Left: scrolling sections -->
-      <div class="lg:order-1">
+      <div class="slide-pin">
+        <div class="slide-stack" id="slideStack">
 
-        <!-- 01 -->
-        <article class="scrolly-section" data-section="0">
-          <p class="section-num mb-3">01 · First-time setup</p>
-          <h2 class="text-3xl font-bold text-slate-200 mb-4">Bootstrap a fresh machine in under a minute.</h2>
-          <div class="mobile-shot lg:hidden"><img src="af1-first-time-setup.jpg" alt="AdminForge first-time setup wizard with PowerShell 7+, RSAT, ExchangeOnlineManagement, and ThreadJob all installed."></div>
-          <div class="space-y-3 text-slate-400">
-            <p><span class="text-slate-300 font-medium">Problem:</span> AdminForge depends on PowerShell 7, the RSAT ActiveDirectory module, ExchangeOnlineManagement, and ThreadJob. Walking each new user through these installs &mdash; including the RSAT step that requires admin elevation via <span class="font-mono text-teal-accent text-sm">Add-WindowsCapability</span> &mdash; meant a half-day onboarding session for every fresh device.</p>
-            <p><span class="text-slate-300 font-medium">Solution:</span> A setup wizard that ships alongside the app. Auto-elevates to admin at startup. Checks each prerequisite, surfaces an orange &ldquo;Install Now&rdquo; per row, flips to green &ldquo;Installed!&rdquo; once verified. On completion it writes a <span class="font-mono text-teal-accent text-sm">setup.state</span> file to <span class="font-mono text-teal-accent text-sm">ProgramData</span> and re-targets the Start Menu shortcut from <span class="font-mono text-teal-accent text-sm">powershell.exe</span> to <span class="font-mono text-teal-accent text-sm">pwsh.exe</span> so subsequent launches go straight into PS7.</p>
-          </div>
-        </article>
-
-        <!-- 02 -->
-        <article class="scrolly-section" data-section="1">
-          <p class="section-num mb-3">02 · Privileged-account logon</p>
-          <h2 class="text-3xl font-bold text-slate-200 mb-4">One credential capture, never written to disk.</h2>
-          <div class="mobile-shot lg:hidden"><img src="af2-logon.jpg" alt="AD Logon dialog requesting a PA account username and password."></div>
-          <div class="space-y-3 text-slate-400">
-            <p><span class="text-slate-300 font-medium">Problem:</span> A privileged-account credential is used by every tab &mdash; AD queries, ACL operations against UNC paths, and Exchange Online. Re-prompting per tab is friction. Storing the credential is a security smell. Subtle credential-format bugs can fail silently three tabs deep.</p>
-            <p><span class="text-slate-300 font-medium">Solution:</span> One logon form at startup. Captures the PA credential as a <span class="font-mono text-teal-accent text-sm">PSCredential</span>, formats it in a specific layout that satisfies both the Win32 <span class="font-mono text-teal-accent text-sm">LogonUser</span> API (used by Tab 4&rsquo;s ACL-fetching subprocess) and Exchange Online simultaneously. &ldquo;Test credentials before proceeding&rdquo; catches bad logons immediately. The credential is held in <span class="font-mono text-teal-accent text-sm">$global:AuthCred</span> for the session, never written to disk. EXO connects in the background while the user lands on Tab 1.</p>
-          </div>
-        </article>
-
-        <!-- 03 -->
-        <article class="scrolly-section" data-section="2">
-          <p class="section-num mb-3">03 · Tab 1 · Meeting Rooms</p>
-          <h2 class="text-3xl font-bold text-slate-200 mb-4">Three room patterns, executed correctly every time.</h2>
-          <div class="mobile-shot lg:hidden"><img src="af3-meeting-rooms.jpg" alt="Meeting Rooms tab showing calendar processing settings, mail flow restrictions, calendar permissions, and three setup pattern options."></div>
-          <div class="space-y-3 text-slate-400">
-            <p><span class="text-slate-300 font-medium">Problem:</span> Configuring a meeting room mailbox in Exchange Online correctly involves <span class="font-mono text-teal-accent text-sm">Set-CalendarProcessing</span>, <span class="font-mono text-teal-accent text-sm">Add-MailboxPermission</span>, calendar permission ACLs, and pruning default + anonymous access. Three subtly different patterns &mdash; Standard, Restricted (PRIV-group-only booking), and Manual Review &mdash; each need a different cmdlet combination. Mistakes lead to unbookable rooms or rooms anyone in the org can clobber.</p>
-            <p><span class="text-slate-300 font-medium">Solution:</span> A single form fetches the current state, resolving the legacy DN entries in <span class="font-mono text-teal-accent text-sm">BookInPolicy</span> back to real display names via <span class="font-mono text-teal-accent text-sm">Get-Recipient</span> on the way through. Classifies what setup pattern the room is in. Lets you switch with one apply. The <span class="text-slate-200">Clean Calendar Permissions</span> button is the workhorse: takes any room with stale or wrong calendar perms and normalises them &mdash; removes non-default principals, sets Default and Anonymous to <span class="font-mono text-teal-accent text-sm">AvailabilityOnly</span>, re-adds the room&rsquo;s PRIV-MBX group as Reviewer.</p>
-          </div>
-        </article>
-
-        <!-- 04 -->
-        <article class="scrolly-section" data-section="3">
-          <p class="section-num mb-3">04 · Tab 2 · Group Compare</p>
-          <h2 class="text-3xl font-bold text-slate-200 mb-4">Onboarding without the spreadsheet.</h2>
-          <div class="mobile-shot lg:hidden"><img src="af4-group-compare.jpg" alt="Group Compare tab showing two side-by-side group lists with comparison controls and add/remove actions."></div>
-          <div class="space-y-3 text-slate-400">
-            <p><span class="text-slate-300 font-medium">Problem:</span> Most onboarding tickets are some variant of &ldquo;make this new starter like Joe Bloggs.&rdquo; Working out which groups Joe is in, which the new starter is in, and what&rsquo;s missing is tedious by hand &mdash; and dangerous if you assume rather than verify.</p>
-            <p><span class="text-slate-300 font-medium">Solution:</span> Fetch both users&rsquo; group memberships, diff them side by side. Toggle to include group descriptions (slower because of the per-group LDAP lookup). Toggle to filter out common groups so only deltas remain. Multi-select on either side feeds into <span class="text-slate-200">Add U1 &rarr; U2</span> or the reverse &mdash; replicating membership in a single click. The status output records every add and remove for the ticket.</p>
-          </div>
-        </article>
-
-        <!-- 05 -->
-        <article class="scrolly-section" data-section="4">
-          <p class="section-num mb-3">05 · Tab 3 · PRIV Group Manager</p>
-          <h2 class="text-3xl font-bold text-slate-200 mb-4">From an email to the right group, every time.</h2>
-          <div class="mobile-shot lg:hidden"><img src="af5-priv-group-manager.jpg" alt="PRIV Group Manager tab showing mailbox lookup, resolved PRIV group, current members table, and add/remove controls."></div>
-          <div class="space-y-3 text-slate-400">
-            <p><span class="text-slate-300 font-medium">Problem:</span> Shared and room mailbox access is controlled by <span class="font-mono text-teal-accent text-sm">priv-mbx-*</span> AD groups. Going from a user&rsquo;s request (&ldquo;Add me to the TestCal mailbox&rdquo;) to the right AD group means resolving the email to a mailbox in EXO, deriving the PRIV group name (which doesn&rsquo;t always follow the obvious convention), finding that group in AD, and only then modifying membership. DisplayName collisions in production AD mean naïve lookups occasionally surface the wrong group.</p>
-            <p><span class="text-slate-300 font-medium">Solution:</span> An <span class="text-slate-200">8-strategy EXO&harr;AD resolution chain</span> that handles every collision pattern we&rsquo;ve seen, including two <span class="font-mono text-teal-accent text-sm">PRIV-MBX-*</span> groups sharing a DisplayName (resolved via DistinguishedName). Lookup &rarr; resolved group &rarr; current members &rarr; add or remove with auto-generated ticket notes that include the standard 30-minute Azure AD Connect sync warning. Managed By is editable inline.</p>
-          </div>
-        </article>
-
-        <!-- 06 -->
-        <article class="scrolly-section" data-section="5">
-          <p class="section-num mb-3">06 · Tab 4 · Folder Access</p>
-          <h2 class="text-3xl font-bold text-slate-200 mb-4">From a path to a group, with the right ACL classification.</h2>
-          <div class="mobile-shot lg:hidden"><img src="af6-folder-access.jpg" alt="Folder Access tab showing path lookup, faculty quick-fill buttons, likely/unlikely group classification, and staff add/remove controls."></div>
-          <div class="space-y-3 text-slate-400">
-            <p><span class="text-slate-300 font-medium">Problem:</span> Modify Folder Access used to be the most error-prone work in the team. A staff member asks for access to a shared folder. The technician must identify which AD group controls that folder&rsquo;s ACL (often multiple groups overlap), pick the right one, add the user, and document the change. The natural way to read an ACL &mdash; opening File Explorer under a PA account &mdash; runs into the WindowsApps execution restriction on modern PowerShell installs.</p>
-            <p><span class="text-slate-300 font-medium">Solution:</span> Faculty quick-fill buttons map common drive prefixes. Path lookup runs the ACL fetch in a subprocess via <span class="font-mono text-teal-accent text-sm">Start-Job -PSVersion 5.1</span>, forcing Windows PowerShell 5.1 from <span class="font-mono text-teal-accent text-sm">System32</span> instead of <span class="font-mono text-teal-accent text-sm">pwsh.exe</span> from the unreadable WindowsApps directory. Returned groups are classified into <span class="text-slate-200">Likely</span> (modify-or-better rights, path-derived naming convention match) and <span class="text-slate-200">Unlikely</span> (everything else). Pick a group, paste IDs, apply. Ticket notes write themselves.</p>
-          </div>
-        </article>
-
-      </div>
-
-      <!-- Right: sticky book -->
-      <aside class="hidden lg:block lg:order-2 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:flex lg:items-center">
-        <div class="w-full">
-          <div class="book" id="book">
-            <div class="page" data-page="0" style="z-index: 60;">
-              <div class="page-badge">01 / 06</div>
-              <img src="af1-first-time-setup.jpg" alt="AdminForge first-time setup wizard." loading="eager">
+          <!-- 01 -->
+          <article class="slide active" data-index="0">
+            <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-14 items-center h-full">
+              <div class="slide-text">
+                <p class="section-num mb-3">01 · First-time setup</p>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">Bootstrap a fresh machine in under a minute.</h2>
+                <div class="space-y-3 text-slate-400">
+                  <p><span class="text-slate-300 font-medium">Problem:</span> AdminForge depends on PowerShell 7, the RSAT ActiveDirectory module, ExchangeOnlineManagement, and ThreadJob. Walking each new user through these installs &mdash; including the RSAT step that requires admin elevation via <span class="font-mono text-teal-accent text-sm">Add-WindowsCapability</span> &mdash; meant a half-day onboarding session for every fresh device.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> A setup wizard that ships alongside the app. Auto-elevates to admin at startup. Checks each prerequisite, surfaces an orange &ldquo;Install Now&rdquo; per row, flips to green &ldquo;Installed!&rdquo; once verified. On completion it writes a <span class="font-mono text-teal-accent text-sm">setup.state</span> file to <span class="font-mono text-teal-accent text-sm">ProgramData</span> and re-targets the Start Menu shortcut from <span class="font-mono text-teal-accent text-sm">powershell.exe</span> to <span class="font-mono text-teal-accent text-sm">pwsh.exe</span>.</p>
+                </div>
+              </div>
+              <div class="slide-image">
+                <div class="slide-image-frame">
+                  <img src="af1-first-time-setup.jpg" alt="AdminForge first-time setup wizard." loading="eager">
+                </div>
+              </div>
             </div>
-            <div class="page" data-page="1" style="z-index: 50;">
-              <div class="page-badge">02 / 06</div>
-              <img src="af2-logon.jpg" alt="AD Logon dialog for PA account." loading="eager">
+          </article>
+
+          <!-- 02 -->
+          <article class="slide next" data-index="1">
+            <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-14 items-center h-full">
+              <div class="slide-text">
+                <p class="section-num mb-3">02 · Privileged-account logon</p>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">One credential capture, never written to disk.</h2>
+                <div class="space-y-3 text-slate-400">
+                  <p><span class="text-slate-300 font-medium">Problem:</span> A privileged-account credential is used by every tab &mdash; AD queries, ACL operations against UNC paths, and Exchange Online. Re-prompting per tab is friction. Storing the credential is a security smell. Subtle credential-format bugs can fail silently three tabs deep.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> One logon form at startup. Captures the PA credential as a <span class="font-mono text-teal-accent text-sm">PSCredential</span>, formats it so it satisfies both the Win32 <span class="font-mono text-teal-accent text-sm">LogonUser</span> API (used by the Folder Access subprocess) and Exchange Online simultaneously. &ldquo;Test credentials before proceeding&rdquo; catches bad logons immediately. The credential is held in <span class="font-mono text-teal-accent text-sm">$global:AuthCred</span> for the session, never written to disk. EXO connects in the background while the user lands on Tab 1.</p>
+                </div>
+              </div>
+              <div class="slide-image">
+                <div class="slide-image-frame">
+                  <img src="af2-logon.jpg" alt="AD Logon dialog requesting a PA account username and password." loading="eager">
+                </div>
+              </div>
             </div>
-            <div class="page" data-page="2" style="z-index: 40;">
-              <div class="page-badge">03 / 06</div>
-              <img src="af3-meeting-rooms.jpg" alt="Meeting Rooms tab." loading="lazy">
+          </article>
+
+          <!-- 03 -->
+          <article class="slide next" data-index="2">
+            <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-14 items-center h-full">
+              <div class="slide-text">
+                <p class="section-num mb-3">03 · Tab 1 · Meeting Rooms</p>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">Three room patterns, executed correctly every time.</h2>
+                <div class="space-y-3 text-slate-400">
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Configuring a meeting room mailbox involves <span class="font-mono text-teal-accent text-sm">Set-CalendarProcessing</span>, <span class="font-mono text-teal-accent text-sm">Add-MailboxPermission</span>, calendar ACLs, and pruning default + anonymous access. Three patterns &mdash; Standard, Restricted, Manual Review &mdash; each need a different cmdlet combination. Mistakes lead to unbookable rooms or rooms anyone in the org can clobber.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> A single form fetches the current state, resolves the legacy DN entries in <span class="font-mono text-teal-accent text-sm">BookInPolicy</span> back to real display names. Classifies what pattern the room is in. Lets you switch with one apply. The <span class="text-slate-200">Clean Calendar Permissions</span> button normalises any room with stale or wrong perms &mdash; removes non-default principals, sets Default and Anonymous to <span class="font-mono text-teal-accent text-sm">AvailabilityOnly</span>, re-adds the PRIV-MBX group as Reviewer.</p>
+                </div>
+              </div>
+              <div class="slide-image">
+                <div class="slide-image-frame">
+                  <img src="af3-meeting-rooms.jpg" alt="Meeting Rooms tab." loading="lazy">
+                </div>
+              </div>
             </div>
-            <div class="page" data-page="3" style="z-index: 30;">
-              <div class="page-badge">04 / 06</div>
-              <img src="af4-group-compare.jpg" alt="Group Compare tab." loading="lazy">
+          </article>
+
+          <!-- 04 -->
+          <article class="slide next" data-index="3">
+            <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-14 items-center h-full">
+              <div class="slide-text">
+                <p class="section-num mb-3">04 · Tab 2 · Group Compare</p>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">Onboarding without the spreadsheet.</h2>
+                <div class="space-y-3 text-slate-400">
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Most onboarding tickets are some variant of &ldquo;make this new starter like Joe Bloggs.&rdquo; Working out which groups Joe is in, which the new starter is in, and what&rsquo;s missing is tedious by hand &mdash; and dangerous if you assume rather than verify.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> Fetch both users&rsquo; group memberships, diff them side by side. Toggle to include group descriptions (slower because of the per-group LDAP lookup). Toggle to filter out common groups so only deltas remain. Multi-select on either side feeds into <span class="text-slate-200">Add U1 &rarr; U2</span> or the reverse &mdash; replicating membership in a single click. The status output records every add and remove for the ticket.</p>
+                </div>
+              </div>
+              <div class="slide-image">
+                <div class="slide-image-frame">
+                  <img src="af4-group-compare.jpg" alt="Group Compare tab." loading="lazy">
+                </div>
+              </div>
             </div>
-            <div class="page" data-page="4" style="z-index: 20;">
-              <div class="page-badge">05 / 06</div>
-              <img src="af5-priv-group-manager.jpg" alt="PRIV Group Manager tab." loading="lazy">
+          </article>
+
+          <!-- 05 -->
+          <article class="slide next" data-index="4">
+            <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-14 items-center h-full">
+              <div class="slide-text">
+                <p class="section-num mb-3">05 · Tab 3 · PRIV Group Manager</p>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">From an email to the right group, every time.</h2>
+                <div class="space-y-3 text-slate-400">
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Shared and room mailbox access is controlled by <span class="font-mono text-teal-accent text-sm">priv-mbx-*</span> AD groups. Going from a user&rsquo;s request to the right AD group means resolving the email in EXO, deriving the PRIV group name, and finding that group in AD. DisplayName collisions in production mean naïve lookups occasionally surface the wrong group.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> An <span class="text-slate-200">8-strategy EXO&harr;AD resolution chain</span> handles every collision pattern we&rsquo;ve seen, including two <span class="font-mono text-teal-accent text-sm">PRIV-MBX-*</span> groups sharing a DisplayName (resolved via DistinguishedName). Lookup &rarr; resolved group &rarr; current members &rarr; add or remove with auto-generated ticket notes that include the standard 30-minute Azure AD Connect sync warning. Managed By is editable inline.</p>
+                </div>
+              </div>
+              <div class="slide-image">
+                <div class="slide-image-frame">
+                  <img src="af5-priv-group-manager.jpg" alt="PRIV Group Manager tab." loading="lazy">
+                </div>
+              </div>
             </div>
-            <div class="page" data-page="5" style="z-index: 10;">
-              <div class="page-badge">06 / 06</div>
-              <img src="af6-folder-access.jpg" alt="Folder Access tab." loading="lazy">
+          </article>
+
+          <!-- 06 -->
+          <article class="slide next" data-index="5">
+            <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-14 items-center h-full">
+              <div class="slide-text">
+                <p class="section-num mb-3">06 · Tab 4 · Folder Access</p>
+                <h2 class="text-3xl font-bold text-slate-200 mb-4">From a path to a group, with the right ACL classification.</h2>
+                <div class="space-y-3 text-slate-400">
+                  <p><span class="text-slate-300 font-medium">Problem:</span> Modify Folder Access used to be the most error-prone work in the team. A staff member asks for access to a shared folder. The technician must identify which AD group controls that folder&rsquo;s ACL (often multiple groups overlap), pick the right one, and add the user. Reading the ACL under a PA account runs into the WindowsApps execution restriction on modern PowerShell installs.</p>
+                  <p><span class="text-slate-300 font-medium">Solution:</span> Faculty quick-fill buttons map common drive prefixes. Path lookup runs the ACL fetch in a subprocess via <span class="font-mono text-teal-accent text-sm">Start-Job -PSVersion 5.1</span>, forcing Windows PowerShell 5.1 from <span class="font-mono text-teal-accent text-sm">System32</span> instead of <span class="font-mono text-teal-accent text-sm">pwsh.exe</span> from the unreadable WindowsApps directory. Returned groups are classified into <span class="text-slate-200">Likely</span> and <span class="text-slate-200">Unlikely</span>. Pick a group, paste IDs, apply. Ticket notes write themselves.</p>
+                </div>
+              </div>
+              <div class="slide-image">
+                <div class="slide-image-frame">
+                  <img src="af6-folder-access.jpg" alt="Folder Access tab." loading="lazy">
+                </div>
+              </div>
             </div>
+          </article>
+
+          <!-- Progress bar (desktop only) -->
+          <div class="slide-progress hidden lg:flex" aria-hidden="true">
+            <div class="slide-progress-bar current"></div>
+            <div class="slide-progress-bar"></div>
+            <div class="slide-progress-bar"></div>
+            <div class="slide-progress-bar"></div>
+            <div class="slide-progress-bar"></div>
+            <div class="slide-progress-bar"></div>
           </div>
 
-          <!-- Progress dots -->
-          <div class="mt-8 flex justify-center items-center gap-3" aria-hidden="true">
-            <div class="progress-dot" data-dot="0"></div>
-            <div class="progress-dot" data-dot="1"></div>
-            <div class="progress-dot" data-dot="2"></div>
-            <div class="progress-dot" data-dot="3"></div>
-            <div class="progress-dot" data-dot="4"></div>
-            <div class="progress-dot" data-dot="5"></div>
-          </div>
         </div>
-      </aside>
-
+      </div>
     </section>
 
-    <!-- ============== Beyond the surface ============== -->
-    <section class="border-t border-slate-500/10 pt-20 pb-24">
+    <!-- Beyond the surface -->
+    <section class="border-t border-slate-500/10 pt-20 pb-24 mt-12 lg:mt-0">
       <p class="section-num mb-3">Beyond the surface</p>
       <h2 class="text-3xl font-bold text-slate-200 mb-8 max-w-3xl">A few engineering decisions that earned their keep.</h2>
 
@@ -400,7 +392,7 @@
       </div>
     </section>
 
-    <!-- ============== Up next ============== -->
+    <!-- Roadmap -->
     <section class="border-t border-slate-500/10 pt-20 pb-32">
       <p class="section-num mb-3">Roadmap</p>
       <h2 class="text-3xl font-bold text-slate-200 mb-6 max-w-3xl">Four more tabs in the queue.</h2>
@@ -422,47 +414,63 @@
   </main>
 
   <script>
-    // Cursor spotlight
     document.addEventListener('mousemove', (e) => {
       document.documentElement.style.setProperty('--mouse-x', e.clientX + 'px');
       document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
     });
 
-    // Book / page flip on scroll
-    const pages = document.querySelectorAll('.page');
-    const dots = document.querySelectorAll('.progress-dot');
-    const sections = document.querySelectorAll('.scrolly-section');
-    let currentIndex = -1;
+    // Slide stack scroll driver (desktop only)
+    const section = document.querySelector('.scrolly-stack-section');
+    const slides = document.querySelectorAll('.slide');
+    const progressBars = document.querySelectorAll('.slide-progress-bar');
+    const numSlides = slides.length;
 
-    const setActivePage = (index) => {
-      if (index === currentIndex) return;
-      currentIndex = index;
-      pages.forEach((page, i) => {
-        page.classList.toggle('flipped', i < index);
-      });
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === index);
-      });
-    };
+    let ticking = false;
+    let lastIndex = -1;
 
-    const observer = new IntersectionObserver((entries) => {
-      // Find the section closest to the centre of the viewport
-      const visible = entries
-        .filter(e => e.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-      if (visible.length > 0) {
-        const idx = parseInt(visible[0].target.dataset.section);
-        setActivePage(idx);
+    function isDesktop() {
+      return window.matchMedia('(min-width: 1024px)').matches;
+    }
+
+    function update() {
+      ticking = false;
+      if (!isDesktop()) return;
+
+      const rect = section.getBoundingClientRect();
+      const sectionHeight = rect.height;
+      const viewportHeight = window.innerHeight;
+      const maxScroll = sectionHeight - viewportHeight;
+
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / maxScroll));
+      const activeIndex = Math.min(numSlides - 1, Math.floor(progress * numSlides));
+
+      if (activeIndex !== lastIndex) {
+        lastIndex = activeIndex;
+        slides.forEach((slide, i) => {
+          slide.classList.remove('past', 'active', 'next');
+          if (i < activeIndex) slide.classList.add('past');
+          else if (i === activeIndex) slide.classList.add('active');
+          else slide.classList.add('next');
+        });
+        progressBars.forEach((bar, i) => {
+          bar.classList.remove('filled', 'current');
+          if (i < activeIndex) bar.classList.add('filled');
+          else if (i === activeIndex) bar.classList.add('current');
+        });
       }
-    }, {
-      rootMargin: '-35% 0px -45% 0px',
-      threshold: [0, 0.25, 0.5, 0.75, 1],
-    });
+    }
 
-    sections.forEach(s => observer.observe(s));
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }
 
-    // Set initial state
-    setActivePage(0);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
   </script>
 
 </body>

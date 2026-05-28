@@ -548,6 +548,15 @@
 
     // Default to first section if nothing intersecting yet
     if (sections[0]) setActive(sections[0].id);
+
+    // Bottom-of-page guard: short final sections may never reach the detection zone
+    window.addEventListener('scroll', () => {
+    const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 4);
+        if (atBottom) {
+            const last = sections[sections.length - 1];
+            if (last) setActive(last.id);
+  }
+}, { passive: true });
   </script>
 
 </body>
